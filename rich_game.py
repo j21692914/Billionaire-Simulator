@@ -16,7 +16,6 @@ st.markdown("""
     h1, h2, h3, h4 {color: #E5C1CD !important; font-family: 'Didot', serif;}
     div, p, span {color: #b0b0b0;}
     
-    /* 资产卡片优化 */
     .asset-card {
         border: 1px solid #333; 
         background: #111; 
@@ -27,7 +26,7 @@ st.markdown("""
     .gold {color: #D4AF37; font-weight: bold;}
     .price-tag {font-family: 'Courier New'; color: #50C878; font-weight: bold;}
     
-    /* 图片容器优化 */
+    /* 图片容器强制 16:9 宽幅 */
     [data-testid="stImage"] {
         border-radius: 8px;
         overflow: hidden;
@@ -40,68 +39,10 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-SAVE_FILE = "game_save.json" 
+SAVE_FILE = "game_save.json"
 
 # ==========================================
-# 1. 精准图源映射 (手动校准版 - 告别大叔图)
-# ==========================================
-def get_real_img(name, cat):
-    name = name.lower()
-    
-    # --- 🏎️ 豪车精准图 ---
-    if cat == "Car":
-        if "sl 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg/800px-Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg"
-        if "g 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg/800px-Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg"
-        if "gt 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Mercedes-AMG_GT_63_S_E_Performance_IAA_2021_1X7A0168.jpg/800px-Mercedes-AMG_GT_63_S_E_Performance_IAA_2021_1X7A0168.jpg"
-        if "s 680" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg/800px-Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg"
-        if "pullman" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Mercedes-Maybach_S_600_Pullman_Genf_2018.jpg/800px-Mercedes-Maybach_S_600_Pullman_Genf_2018.jpg"
-        if "g800" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Brabus_800_Widestar.jpg/800px-Brabus_800_Widestar.jpg"
-        if "m4" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/BMW_G82_IAA_2021_1X7A0064.jpg/800px-BMW_G82_IAA_2021_1X7A0064.jpg"
-        if "i8" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/BMW_i8_Roadster_IMG_1523.jpg/800px-BMW_i8_Roadster_IMG_1523.jpg"
-        if "rs 6" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Audi_RS6_Avant_C8_IAA_2019_JM_0485.jpg/800px-Audi_RS6_Avant_C8_IAA_2019_JM_0485.jpg"
-        if "navigator" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/2018_Lincoln_Navigator_Reserve_AWD_front_4.16.18.jpg/800px-2018_Lincoln_Navigator_Reserve_AWD_front_4.16.18.jpg"
-        if "range rover" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Land_Rover_Range_Rover_L460_Autobiography_IAA_2023_1X7A0388.jpg/800px-Land_Rover_Range_Rover_L460_Autobiography_IAA_2023_1X7A0388.jpg"
-        if "cullinan" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg/800px-Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg"
-        if "phantom" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Rolls-Royce_Phantom_VIII_IMG_4473.jpg/800px-Rolls-Royce_Phantom_VIII_IMG_4473.jpg"
-        if "revuelto" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Lamborghini_Revuelto_1X7A6673.jpg/800px-Lamborghini_Revuelto_1X7A6673.jpg"
-        if "sf90" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg/800px-Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg"
-        if "chiron" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg/800px-Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg"
-        
-        # 默认车图
-        return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg/800px-Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg"
-
-    # --- ✈️ 舰队精准图 ---
-    if cat == "Fleet":
-        if "yacht" in name:
-            if "azzam" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Azzam_2012.jpg/800px-Azzam_2012.jpg"
-            if "dilbar" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Dilbar_Antibes_02_06_2016.jpg/800px-Dilbar_Antibes_02_06_2016.jpg"
-            if "eclipse" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Yacht_Eclipse_Antibes.jpg/800px-Yacht_Eclipse_Antibes.jpg"
-            return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/L%C3%BCrssen_Nord.jpg/800px-L%C3%BCrssen_Nord.jpg"
-            
-        if "gulfstream" in name: 
-            if "g700" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Gulfstream_G700_N702GD_at_EBACE_2022.jpg/800px-Gulfstream_G700_N702GD_at_EBACE_2022.jpg"
-            return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Gulfstream_G700_%28N702GD%29_in_flight.jpg/800px-Gulfstream_G700_%28N702GD%29_in_flight.jpg"
-            
-        if "global" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg/800px-Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg"
-        if "falcon" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Dassault_Falcon_8X_F-WWQA_PAS_2015_02.jpg/800px-Dassault_Falcon_8X_F-WWQA_PAS_2015_02.jpg"
-        if "bbj" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Boeing_Business_Jet_737-700_BBJ%2C_Private_JP7397145.jpg/800px-Boeing_Business_Jet_737-700_BBJ%2C_Private_JP7397145.jpg"
-        
-        # 默认飞机
-        return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Cessna_Citation_Longitude_%28N702CL%29_at_EBACE_2019.jpg/800px-Cessna_Citation_Longitude_%28N702CL%29_at_EBACE_2019.jpg"
-
-    # --- 🏰 地产精准图 ---
-    if cat == "Estate":
-        if "101" in name or "park" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Central_Park_Tower_%2852233633214%29.jpg/800px-Central_Park_Tower_%2852233633214%29.jpg"
-        if "courtyard" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Siheyuan_Beijing.jpg/800px-Siheyuan_Beijing.jpg"
-        if "the one" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/The_Manor_at_Holmby_Hills.jpg/800px-The_Manor_at_Holmby_Hills.jpg"
-        if "hyde" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/One_Hyde_Park_Knightsbridge.jpg/800px-One_Hyde_Park_Knightsbridge.jpg"
-        if "odéon" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Tour_Od%C3%A9on_from_Jardin_Exotique.jpg/800px-Tour_Od%C3%A9on_from_Jardin_Exotique.jpg"
-        return "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Chateau_de_Vaux_le_Vicomte.jpg/800px-Chateau_de_Vaux_le_Vicomte.jpg"
-
-    return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Hermes_Birkin_Himalaya.jpg/800px-Hermes_Birkin_Himalaya.jpg"
-
-# ==========================================
-# 2. 深度选配矩阵 (无错版)
+# 1. 深度选配矩阵
 # ==========================================
 OPTS_CAR = {
     "Paint": {"Standard":0, "Metallic":5000, "Matte":15000, "Bespoke":45000},
@@ -121,11 +62,60 @@ OPTS_MEGA_YACHT = {
     "Pool": {"Deck":0, "Infinity":2000000}
 }
 OPTS_ESTATE = {"Style": {"Modern":0, "Classic":500000}, "Security": {"Std":0, "Armed":800000}, "Staff": {"None":0, "Full Team":800000}}
-OPTS_WATCH = {"Material": {"Steel":0, "Gold":35000}, "Dial": {"Std":0, "Meteorite":15000}}
-OPTS_LUXURY = {"Leather": {"Togo":0, "Croc":45000}, "Hardware": {"Gold":0, "Diamond":85000}}
+OPTS_WATCH = {"Material": {"Steel":0, "Gold":35000}, "Dial": {"Std":0, "Meteorite":15000}, "Gem": {"None":0, "Diamond":25000}}
+OPTS_LUXURY = {"Leather": {"Togo":0, "Croc":45000}, "Hardware": {"Gold":0, "Diamond":85000}, "Condition": {"New":0, "Vintage":5000}}
 
 # ==========================================
-# 3. 数据工厂
+# 2. 稳定的高清图库 (国内可用源)
+# ==========================================
+# 使用 Unsplash/Pexels 的稳定图链，不使用随机搜索，确保是车不是人
+IMG_LIB = {
+    "Rolls-Royce": "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&q=80&w=1200", # 劳斯莱斯
+    "Ferrari": "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&q=80&w=1200", # 法拉利红
+    "Lamborghini": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=1200", # 兰博基尼
+    "Porsche": "https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80&w=1200", # 保时捷
+    "Mercedes": "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=1200", # 奔驰GT
+    "BMW": "https://images.unsplash.com/photo-1555215695-3004980adade?auto=format&fit=crop&q=80&w=1200", # 宝马
+    "Bugatti": "https://images.unsplash.com/photo-1627454820574-fb40e69228d4?auto=format&fit=crop&q=80&w=1200", # 布加迪
+    "McLaren": "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200", # 迈凯伦
+    "Jet": "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=1200", # 私人飞机内部
+    "Yacht": "https://images.unsplash.com/photo-1605281317010-fe5ffe79b9b4?auto=format&fit=crop&q=80&w=1200", # 超级游艇
+    "Mansion": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200", # 豪宅
+    "CityPH": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200", # 城市大平层
+    "Watch": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&q=80&w=1200", # 名表
+    "Bag": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=1200", # 铂金包
+    "Default": "https://images.unsplash.com/photo-1566373733075-bd74c4380eb9?auto=format&fit=crop&q=80&w=1200" # 奢华氛围
+}
+
+def get_safe_img(name, cat):
+    name = name.lower()
+    # 按照优先级匹配图片
+    if cat == "Car":
+        if "rolls" in name or "phantom" in name or "cullinan" in name or "spectre" in name: return IMG_LIB["Rolls-Royce"]
+        if "ferrari" in name or "sf90" in name or "488" in name: return IMG_LIB["Ferrari"]
+        if "lambo" in name or "urus" in name or "revuelto" in name: return IMG_LIB["Lamborghini"]
+        if "porsche" in name or "911" in name: return IMG_LIB["Porsche"]
+        if "mercedes" in name or "amg" in name or "maybach" in name: return IMG_LIB["Mercedes"]
+        if "bmw" in name: return IMG_LIB["BMW"]
+        if "bugatti" in name or "chiron" in name: return IMG_LIB["Bugatti"]
+        if "mclaren" in name: return IMG_LIB["McLaren"]
+        return IMG_LIB["Mercedes"] # 默认好车
+    
+    if cat == "Fleet":
+        if "yacht" in name or "azzam" in name or "eclipse" in name: return IMG_LIB["Yacht"]
+        return IMG_LIB["Jet"]
+    
+    if cat == "Estate":
+        if "villa" in name or "house" in name or "mansion" in name or "gong" in name: return IMG_LIB["Mansion"]
+        return IMG_LIB["CityPH"] # 公寓/顶复
+    
+    if cat == "Watch": return IMG_LIB["Watch"]
+    if cat == "Luxury": return IMG_LIB["Bag"]
+    
+    return IMG_LIB["Default"]
+
+# ==========================================
+# 3. 数据工厂 (Data Factory)
 # ==========================================
 def generate_db():
     db = {"Car":[], "Estate":[], "Watch":[], "Fleet":[], "Luxury":[]}
@@ -141,35 +131,32 @@ def generate_db():
         ("London", "One Hyde Park Penthouse", 120000000)
     ]
     for i, (loc, name, price) in enumerate(estates):
-        db["Estate"].append({"id":f"e_{i}", "brand":loc, "name":name, "price":price, "type":"Ultra Prime", "img":get_real_img(name, "Estate"), "opts":OPTS_ESTATE})
+        db["Estate"].append({"id":f"e_{i}", "brand":loc, "name":name, "price":price, "type":"Ultra Prime", "img":get_safe_img(name, "Estate"), "opts":OPTS_ESTATE})
 
-    # 2. 舰队 (飞机+游艇)
-    # 飞机
+    # 2. 舰队
     jets = [
-        ("Gulfstream", "G700", 78000000), ("Gulfstream", "G650ER", 70000000), ("Gulfstream", "G280", 25000000),
-        ("Bombardier", "Global 7500", 75000000), ("Bombardier", "Global 6500", 56000000),
-        ("Dassault", "Falcon 8X", 58000000), ("Dassault", "Falcon 10X", 75000000),
-        ("Boeing", "BBJ MAX 8", 110000000), ("Boeing", "BBJ 787", 250000000)
+        ("Gulfstream", "G700", 78000000), ("Gulfstream", "G650ER", 70000000), 
+        ("Bombardier", "Global 7500", 75000000), ("Dassault", "Falcon 10X", 75000000),
+        ("Boeing", "BBJ 787", 250000000)
     ]
     for i, (brand, name, price) in enumerate(jets):
-        db["Fleet"].append({"id":f"j_{i}", "brand":brand, "name":name, "price":price, "type":"Private Jet", "img":get_real_img(name, "Fleet"), "opts":OPTS_JET})
+        db["Fleet"].append({"id":f"j_{i}", "brand":brand, "name":name, "price":price, "type":"Private Jet", "img":get_safe_img(name, "Fleet"), "opts":OPTS_JET})
     
-    # 游艇
     yachts = [
-        ("Lürssen", "Azzam", 600000000), ("Blohm+Voss", "Eclipse", 1200000000), ("Lürssen", "Dilbar", 800000000),
+        ("Lürssen", "Azzam", 600000000), ("Blohm+Voss", "Eclipse", 1200000000), 
         ("Oceanco", "Jubilee", 300000000), ("Lürssen", "Flying Fox", 400000000)
     ]
     for i, (brand, name, price) in enumerate(yachts):
-        db["Fleet"].append({"id":f"y_{i}", "brand":brand, "name":name, "price":price, "type":"Mega Yacht", "img":get_real_img(name, "Fleet"), "opts":OPTS_MEGA_YACHT})
+        db["Fleet"].append({"id":f"y_{i}", "brand":brand, "name":name, "price":price, "type":"Mega Yacht", "img":get_safe_img(name, "Fleet"), "opts":OPTS_MEGA_YACHT})
 
     # 3. 车辆
     cars = [
         ("Mercedes-AMG", "SL 63", 185000), ("Mercedes-AMG", "G 63", 190000), ("Mercedes-AMG", "GT 63 S", 195000),
-        ("Maybach", "S 680", 250000), ("Maybach", "Pullman Guard", 1600000), ("Brabus", "G800", 450000),
-        ("BMW", "M4 Comp", 95000), ("BMW", "M8 Comp", 140000), ("BMW", "i8 Roadster", 165000),
-        ("Audi", "RS 6", 130000), ("Audi", "RS 7", 135000), ("Lincoln", "Navigator", 120000), ("Land Rover", "Range Rover SV", 240000),
-        ("Porsche", "911 Turbo S", 240000), ("Porsche", "Taycan Turbo GT", 230000),
-        ("Maserati", "MC20", 220000), ("McLaren", "720S", 320000), ("McLaren", "Speedtail", 2500000),
+        ("Maybach", "S 680", 250000), ("Brabus", "G800", 450000),
+        ("BMW", "M4 Comp", 95000), ("BMW", "M8 Comp", 140000),
+        ("Audi", "RS 6", 130000), ("Lincoln", "Navigator", 120000), ("Land Rover", "Range Rover SV", 240000),
+        ("Porsche", "911 Turbo S", 240000), ("Porsche", "911 GT3 RS", 280000),
+        ("Maserati", "MC20", 220000), ("McLaren", "765LT", 390000), ("McLaren", "Speedtail", 2500000),
         ("Aston Martin", "DB12", 250000), ("Aston Martin", "Valkyrie", 3500000),
         ("Ferrari", "SF90", 550000), ("Ferrari", "Purosangue", 400000), ("Ferrari", "812 Comp", 650000),
         ("Lamborghini", "Revuelto", 620000), ("Lamborghini", "Urus", 270000),
@@ -177,12 +164,12 @@ def generate_db():
         ("Bentley", "Conti GT", 300000), ("Bugatti", "Chiron", 3300000)
     ]
     for i, (brand, name, price) in enumerate(cars):
-        db["Car"].append({"id":f"c_{i}", "brand":brand, "name":name, "price":price, "type":"Car", "img":get_real_img(name, "Car"), "opts":OPTS_CAR})
+        db["Car"].append({"id":f"c_{i}", "brand":brand, "name":name, "price":price, "type":"Car", "img":get_safe_img(name, "Car"), "opts":OPTS_CAR})
 
     # 4. 补全
     for i in range(10):
-        db["Watch"].append({"id":f"w_{i}","brand":"Rolex","name":f"Daytona #{i}","price":35000,"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Rolex_Daytona_116500LN.jpg/600px-Rolex_Daytona_116500LN.jpg","opts":OPTS_WATCH})
-        db["Luxury"].append({"id":f"l_{i}","brand":"Hermes","name":f"Birkin #{i}","price":15000,"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Hermes_Birkin_Himalaya.jpg/600px-Hermes_Birkin_Himalaya.jpg","opts":OPTS_LUXURY})
+        db["Watch"].append({"id":f"w_{i}","brand":"Rolex","name":f"Daytona #{i}","price":35000,"img":get_safe_img("","Watch"),"opts":OPTS_WATCH})
+        db["Luxury"].append({"id":f"l_{i}","brand":"Hermes","name":f"Birkin #{i}","price":15000,"img":get_safe_img("","Luxury"),"opts":OPTS_LUXURY})
 
     return db
 
@@ -204,6 +191,11 @@ def buy_item(item, final_price, specs):
         st.toast("✅ Purchased!")
         st.rerun()
     else: st.error("Insufficient Funds")
+
+def sell_item(idx):
+    item = st.session_state.inventory[idx]
+    st.session_state.cash += item['val']
+    st.session_state.inventory.pop(idx); st.toast("Sold!"); st.rerun()
 
 # ==========================================
 # 5. 界面渲染
@@ -248,7 +240,6 @@ with tabs[1]:
             c1.image(item['img'])
             with c2:
                 st.markdown(f"### {item['name']}")
-                st.caption(item['type'])
                 st.markdown(f"Price: ${item['price']:,}")
                 render_configurator(item)
             st.markdown("</div>", unsafe_allow_html=True)
@@ -271,10 +262,12 @@ with tabs[2]:
 # 渲染资产
 with tabs[5]:
     if not st.session_state.inventory: st.info("Inventory Empty")
-    for item in st.session_state.inventory:
+    for i, item in enumerate(st.session_state.inventory):
         with st.container():
-            c1, c2 = st.columns([1, 3])
+            c1, c2, c3 = st.columns([2, 3, 1])
             c1.image(item['img'])
             with c2:
                 st.write(f"**{item['name']}**")
                 st.caption(item['specs'])
+            with c3:
+                if st.button("Sell", key=f"sell_{i}"): sell_item(i)
