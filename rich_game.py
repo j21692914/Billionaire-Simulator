@@ -26,7 +26,6 @@ st.markdown("""
     .gold {color: #D4AF37; font-weight: bold;}
     .price-tag {font-family: 'Courier New'; color: #50C878; font-weight: bold;}
     
-    /* 图片容器强制 16:9 宽幅 */
     [data-testid="stImage"] {
         border-radius: 8px;
         overflow: hidden;
@@ -66,30 +65,28 @@ OPTS_WATCH = {"Material": {"Steel":0, "Gold":35000}, "Dial": {"Std":0, "Meteorit
 OPTS_LUXURY = {"Leather": {"Togo":0, "Croc":45000}, "Hardware": {"Gold":0, "Diamond":85000}, "Condition": {"New":0, "Vintage":5000}}
 
 # ==========================================
-# 2. 稳定的高清图库 (国内可用源)
+# 2. 高清图库 (国内稳定源)
 # ==========================================
-# 使用 Unsplash/Pexels 的稳定图链，不使用随机搜索，确保是车不是人
 IMG_LIB = {
-    "Rolls-Royce": "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&q=80&w=1200", # 劳斯莱斯
-    "Ferrari": "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&q=80&w=1200", # 法拉利红
-    "Lamborghini": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=1200", # 兰博基尼
-    "Porsche": "https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80&w=1200", # 保时捷
-    "Mercedes": "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=1200", # 奔驰GT
-    "BMW": "https://images.unsplash.com/photo-1555215695-3004980adade?auto=format&fit=crop&q=80&w=1200", # 宝马
-    "Bugatti": "https://images.unsplash.com/photo-1627454820574-fb40e69228d4?auto=format&fit=crop&q=80&w=1200", # 布加迪
-    "McLaren": "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200", # 迈凯伦
-    "Jet": "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=1200", # 私人飞机内部
-    "Yacht": "https://images.unsplash.com/photo-1605281317010-fe5ffe79b9b4?auto=format&fit=crop&q=80&w=1200", # 超级游艇
-    "Mansion": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200", # 豪宅
-    "CityPH": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200", # 城市大平层
-    "Watch": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&q=80&w=1200", # 名表
-    "Bag": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=1200", # 铂金包
-    "Default": "https://images.unsplash.com/photo-1566373733075-bd74c4380eb9?auto=format&fit=crop&q=80&w=1200" # 奢华氛围
+    "Rolls-Royce": "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&q=80&w=1200", 
+    "Ferrari": "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&q=80&w=1200", 
+    "Lamborghini": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=80&w=1200", 
+    "Porsche": "https://images.unsplash.com/photo-1503376763036-066120622c74?auto=format&fit=crop&q=80&w=1200", 
+    "Mercedes": "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=1200", 
+    "BMW": "https://images.unsplash.com/photo-1555215695-3004980adade?auto=format&fit=crop&q=80&w=1200", 
+    "Bugatti": "https://images.unsplash.com/photo-1627454820574-fb40e69228d4?auto=format&fit=crop&q=80&w=1200", 
+    "McLaren": "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&q=80&w=1200", 
+    "Jet": "https://images.unsplash.com/photo-1540962351504-03099e0a754b?auto=format&fit=crop&q=80&w=1200", 
+    "Yacht": "https://images.unsplash.com/photo-1605281317010-fe5ffe79b9b4?auto=format&fit=crop&q=80&w=1200", 
+    "Mansion": "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=1200", 
+    "CityPH": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1200", 
+    "Watch": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&q=80&w=1200", 
+    "Bag": "https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=1200", 
+    "Default": "https://images.unsplash.com/photo-1566373733075-bd74c4380eb9?auto=format&fit=crop&q=80&w=1200"
 }
 
 def get_safe_img(name, cat):
     name = name.lower()
-    # 按照优先级匹配图片
     if cat == "Car":
         if "rolls" in name or "phantom" in name or "cullinan" in name or "spectre" in name: return IMG_LIB["Rolls-Royce"]
         if "ferrari" in name or "sf90" in name or "488" in name: return IMG_LIB["Ferrari"]
@@ -99,23 +96,19 @@ def get_safe_img(name, cat):
         if "bmw" in name: return IMG_LIB["BMW"]
         if "bugatti" in name or "chiron" in name: return IMG_LIB["Bugatti"]
         if "mclaren" in name: return IMG_LIB["McLaren"]
-        return IMG_LIB["Mercedes"] # 默认好车
-    
+        return IMG_LIB["Mercedes"]
     if cat == "Fleet":
         if "yacht" in name or "azzam" in name or "eclipse" in name: return IMG_LIB["Yacht"]
         return IMG_LIB["Jet"]
-    
     if cat == "Estate":
         if "villa" in name or "house" in name or "mansion" in name or "gong" in name: return IMG_LIB["Mansion"]
-        return IMG_LIB["CityPH"] # 公寓/顶复
-    
+        return IMG_LIB["CityPH"]
     if cat == "Watch": return IMG_LIB["Watch"]
     if cat == "Luxury": return IMG_LIB["Bag"]
-    
     return IMG_LIB["Default"]
 
 # ==========================================
-# 3. 数据工厂 (Data Factory)
+# 3. 数据工厂 (修复了丢失的循环)
 # ==========================================
 def generate_db():
     db = {"Car":[], "Estate":[], "Watch":[], "Fleet":[], "Luxury":[]}
@@ -166,10 +159,24 @@ def generate_db():
     for i, (brand, name, price) in enumerate(cars):
         db["Car"].append({"id":f"c_{i}", "brand":brand, "name":name, "price":price, "type":"Car", "img":get_safe_img(name, "Car"), "opts":OPTS_CAR})
 
-    # 4. 补全
-    for i in range(10):
-        db["Watch"].append({"id":f"w_{i}","brand":"Rolex","name":f"Daytona #{i}","price":35000,"img":get_safe_img("","Watch"),"opts":OPTS_WATCH})
-        db["Luxury"].append({"id":f"l_{i}","brand":"Hermes","name":f"Birkin #{i}","price":15000,"img":get_safe_img("","Luxury"),"opts":OPTS_LUXURY})
+    # 4. 补全 (这里是之前漏掉的！)
+    for i in range(12):
+        db["Watch"].append({
+            "id":f"w_{i}", "brand":"Patek Philippe" if i%2==0 else "Rolex", 
+            "name":f"Grand Complication #{i}" if i%2==0 else f"Daytona Rainbow #{i}",
+            "price":random.randint(5,50)*10000, 
+            "img":get_safe_img("watch", "Watch"), 
+            "opts":OPTS_WATCH
+        })
+        
+    for i in range(12):
+        db["Luxury"].append({
+            "id":f"l_{i}", "brand":"Hermès", 
+            "name":f"Birkin Himalaya #{i}", 
+            "price":random.randint(1,20)*10000, 
+            "img":get_safe_img("bag", "Luxury"), 
+            "opts":OPTS_LUXURY
+        })
 
     return db
 
@@ -226,8 +233,9 @@ with tabs[0]:
             c1, c2 = st.columns([2, 3])
             c1.image(item['img'])
             with c2:
+                st.markdown(f"<span class='gold'>{item['brand']}</span>", unsafe_allow_html=True)
                 st.markdown(f"### {item['name']}")
-                st.markdown(f"Price: ${item['price']:,}")
+                st.markdown(f"Price: <span class='price-tag'>${item['price']:,}</span>", unsafe_allow_html=True)
                 render_configurator(item)
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -239,8 +247,10 @@ with tabs[1]:
             c1, c2 = st.columns([2, 3])
             c1.image(item['img'])
             with c2:
+                st.markdown(f"<span class='gold'>{item['brand']}</span>", unsafe_allow_html=True)
                 st.markdown(f"### {item['name']}")
-                st.markdown(f"Price: ${item['price']:,}")
+                st.caption(item['type'])
+                st.markdown(f"Price: <span class='price-tag'>${item['price']:,}</span>", unsafe_allow_html=True)
                 render_configurator(item)
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -254,6 +264,35 @@ with tabs[2]:
             c1, c2 = st.columns([2, 3])
             c1.image(item['img'])
             with c2:
+                st.markdown(f"<span class='gold'>{item['brand']}</span>", unsafe_allow_html=True)
+                st.markdown(f"### {item['name']}")
+                st.markdown(f"Price: ${item['price']:,}")
+                render_configurator(item)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+# 渲染 Watches (修复后应该能看到了)
+with tabs[3]:
+    for item in DB["Watch"]:
+        with st.container():
+            st.markdown(f"<div class='asset-card'>", unsafe_allow_html=True)
+            c1, c2 = st.columns([2, 3])
+            c1.image(item['img'])
+            with c2:
+                st.markdown(f"<span class='gold'>{item['brand']}</span>", unsafe_allow_html=True)
+                st.markdown(f"### {item['name']}")
+                st.markdown(f"Price: ${item['price']:,}")
+                render_configurator(item)
+            st.markdown("</div>", unsafe_allow_html=True)
+
+# 渲染 Luxury (修复后应该能看到了)
+with tabs[4]:
+    for item in DB["Luxury"]:
+        with st.container():
+            st.markdown(f"<div class='asset-card'>", unsafe_allow_html=True)
+            c1, c2 = st.columns([2, 3])
+            c1.image(item['img'])
+            with c2:
+                st.markdown(f"<span class='gold'>{item['brand']}</span>", unsafe_allow_html=True)
                 st.markdown(f"### {item['name']}")
                 st.markdown(f"Price: ${item['price']:,}")
                 render_configurator(item)
@@ -270,4 +309,5 @@ with tabs[5]:
                 st.write(f"**{item['name']}**")
                 st.caption(item['specs'])
             with c3:
+                st.write(f"Val: ${item['val']:,.0f}")
                 if st.button("Sell", key=f"sell_{i}"): sell_item(i)
