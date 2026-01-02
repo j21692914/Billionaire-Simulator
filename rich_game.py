@@ -1,181 +1,244 @@
 import streamlit as st
 import pandas as pd
 import random
+import time
 
 # ==========================================
-# 0. 基础配置
+# 0. 极简奢华UI配置 (黑金风格，无图)
 # ==========================================
-st.set_page_config(page_title="World Owner", layout="wide", page_icon="👑")
+st.set_page_config(page_title="Centurion Bank OS", layout="wide", page_icon="💳")
 
 st.markdown("""
 <style>
-    .stApp {background-color: #050505;}
-    .asset-card {border: 1px solid #333; background: #111; border-radius: 12px; padding: 15px; margin-bottom: 15px;}
-    h1, h2, h3 {color: #E5C1CD !important;} 
-    p, span, div {color: #b0b0b0;}
-    [data-testid="stImage"] img {object-fit: cover; aspect-ratio: 16/9; width: 100%; border-radius: 8px;}
+    /* 全局深色背景 */
+    .stApp {
+        background-color: #000000;
+        color: #e0e0e0;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    }
+    
+    /* 侧边栏 */
+    [data-testid="stSidebar"] {
+        background-color: #0a0a0a;
+        border-right: 1px solid #222;
+    }
+    
+    /* 标题和文本 */
+    h1, h2, h3 { color: #D4AF37 !important; letter-spacing: 1px; } /* 金色标题 */
+    .big-icon { font-size: 3rem; margin-bottom: 10px; }
+    
+    /* --- 私人银行卡片风格 --- */
+    .bank-card {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+        border: 2px solid #D4AF37;
+        border-radius: 20px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+        margin-bottom: 30px;
+    }
+    .balance-title {
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+    }
+    .balance-amount {
+        font-family: 'Courier New', monospace;
+        font-size: 4rem;
+        font-weight: bold;
+        color: #D4AF37;
+        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        margin: 15px 0;
+    }
+    .income-tag {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: #4CAF50;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+    
+    /* --- 资产列表卡片风格 (纯文本) --- */
+    .text-asset-card {
+        background-color: #111;
+        border-left: 4px solid #D4AF37;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        transition: transform 0.2s;
+    }
+    .text-asset-card:hover {
+        transform: translateX(5px);
+        background-color: #161616;
+    }
+    .asset-name { font-size: 1.2rem; font-weight: bold; color: #fff; }
+    .asset-price { font-family: monospace; color: #D4AF37; font-size: 1.1rem; }
+    .asset-brand { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;}
+    
+    /* 按钮美化 */
+    div.stButton > button {
+        background-color: transparent;
+        border: 1px solid #D4AF37;
+        color: #D4AF37;
+        border-radius: 5px;
+        padding: 5px 15px;
+    }
+    div.stButton > button:hover {
+        background-color: #D4AF37;
+        color: black;
+        border-color: #D4AF37;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. 精准图库 (维基百科直链 - 绝对对应)
+# 1. 核心逻辑：银行系统与被动收入
 # ==========================================
-# 这里的链接都是对应真实型号的
-URLS = {
-    # --- 🚗 Cars ---
-    "G63": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg/800px-Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg",
-    "SL63": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg/800px-Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg",
-    "Maybach": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg/800px-Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg",
-    "Cullinan": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg/800px-Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg",
-    "Phantom": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Rolls-Royce_Phantom_VIII_IMG_4473.jpg/800px-Rolls-Royce_Phantom_VIII_IMG_4473.jpg",
-    "Ferrari": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg/800px-Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg",
-    "Lambo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Lamborghini_Revuelto_1X7A6673.jpg/800px-Lamborghini_Revuelto_1X7A6673.jpg",
-    "Urus": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Lamborghini_Urus_Performante_IAA_2023_1X7A0284.jpg/800px-Lamborghini_Urus_Performante_IAA_2023_1X7A0284.jpg",
-    "Bugatti": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg/800px-Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg",
-    "Porsche": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Porsche_992_GT3_RS_IAA_2023_1X7A0307.jpg/800px-Porsche_992_GT3_RS_IAA_2023_1X7A0307.jpg",
-    
-    # --- ✈️ Jets ---
-    "G700": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Gulfstream_G700_N702GD_at_EBACE_2022.jpg/800px-Gulfstream_G700_N702GD_at_EBACE_2022.jpg",
-    "G650": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/N650PH_Gulfstream_G650_G6_VJT_%2843953736785%29.jpg/800px-N650PH_Gulfstream_G650_G6_VJT_%2843953736785%29.jpg",
-    "BBJ": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Boeing_737-7BC_BBJ_Privat_HB-IIQ_ZRH_2009-08-12.png/800px-Boeing_737-7BC_BBJ_Privat_HB-IIQ_ZRH_2009-08-12.png",
-    "Global": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg/800px-Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg",
-    
-    # --- ⚓ Yachts ---
-    "Azzam": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Azzam_2012.jpg/800px-Azzam_2012.jpg",
-    "Eclipse": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Yacht_Eclipse_Antibes.jpg/800px-Yacht_Eclipse_Antibes.jpg",
-    "Dilbar": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Dilbar_Antibes_02_06_2016.jpg/800px-Dilbar_Antibes_02_06_2016.jpg",
-    "Jubilee": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Jubilee_Antibes.jpg/800px-Jubilee_Antibes.jpg",
-    
-    # --- ⌚ Watch & 👜 Bag ---
-    "Patek": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Patek_Philippe_Nautilus_5712.jpg/640px-Patek_Philippe_Nautilus_5712.jpg",
-    "Rolex": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Rolex_Daytona_116500LN.jpg/640px-Rolex_Daytona_116500LN.jpg",
-    "Birkin": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Hermes_Birkin_Himalaya.jpg/640px-Hermes_Birkin_Himalaya.jpg",
-    "Kelly": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Hermes_Kelly_Bag.jpg/640px-Hermes_Kelly_Bag.jpg",
-    
-    "Default": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg/800px-Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg"
-}
+# 初始资金：100亿
+INITIAL_CAPITAL = 10000000000
+# 被动收入速率：每次操作赚取 $500,000 到 $2,000,000 不等
+PASSIVE_INCOME_BASE = 500000 
 
-def get_img(name, cat):
-    n = name.lower()
-    # 车辆精准匹配
-    if "g 63" in n: return URLS["G63"]
-    if "sl 63" in n: return URLS["SL63"]
-    if "maybach" in n or "s 680" in n: return URLS["Maybach"]
-    if "cullinan" in n: return URLS["Cullinan"]
-    if "phantom" in n or "spectre" in n: return URLS["Phantom"]
-    if "ferrari" in n: return URLS["Ferrari"]
-    if "urus" in n: return URLS["Urus"]
-    if "lambo" in n: return URLS["Lambo"]
-    if "bugatti" in n: return URLS["Bugatti"]
-    if "porsche" in n: return URLS["Porsche"]
-    # 飞机精准匹配
-    if "g700" in n: return URLS["G700"]
-    if "g650" in n: return URLS["G650"]
-    if "bbj" in n: return URLS["BBJ"]
-    if "global" in n: return URLS["Global"]
-    # 游艇精准匹配
-    if "azzam" in n: return URLS["Azzam"]
-    if "eclipse" in n: return URLS["Eclipse"]
-    if "dilbar" in n: return URLS["Dilbar"]
-    if "jubilee" in n: return URLS["Jubilee"]
-    # 奢侈品
-    if "patek" in n: return URLS["Patek"]
-    if "rolex" in n: return URLS["Rolex"]
-    if "himalaya" in n: return URLS["Birkin"]
-    if "kelly" in n: return URLS["Kelly"]
-    
-    return URLS["Default"]
+if 'cash' not in st.session_state:
+    st.session_state.cash = INITIAL_CAPITAL
+    st.session_state.inventory = []
+    st.session_state.last_income = 0
 
-# ==========================================
-# 2. 逻辑层
-# ==========================================
-if 'cash' not in st.session_state: st.session_state.cash = 10000000000
-if 'inventory' not in st.session_state: st.session_state.inventory = []
+# --- 被动收入引擎 ---
+# 每次页面重新加载（任何点击操作）都会触发
+income_this_tick = random.randint(PASSIVE_INCOME_BASE, PASSIVE_INCOME_BASE * 4)
+st.session_state.cash += income_this_tick
+st.session_state.last_income = income_this_tick
+# 弹出提示
+st.toast(f"📈 Global Business Income: +${income_this_tick:,}")
+
 
 def buy(item):
-    st.session_state.inventory.append(item)
-    st.session_state.cash -= item['price']
-    st.toast(f"Purchased: {item['name']}")
+    if st.session_state.cash >= item['price']:
+        st.session_state.cash -= item['price']
+        st.session_state.inventory.append(item)
+        st.toast(f"✅ Acquired: {item['name']}")
+        st.rerun() # 强制刷新以更新余额显示
 
 def sell(i):
     item = st.session_state.inventory.pop(i)
-    st.session_state.cash += item['price']
-    st.toast("Sold!")
+    st.session_state.cash += item['price'] # 原价卖出
+    st.toast(f"💰 Sold: {item['name']}")
     st.rerun()
 
 # ==========================================
-# 3. 数据库生成
+# 2. 纯文本数据库 (无图版)
 # ==========================================
-DB = {"Car":[], "Jet":[], "Yacht":[], "Estate":[], "Watch":[], "Luxury":[]}
+def create_db():
+    # 格式: (品牌, 型号, 价格)
+    db = {
+        "🚗 Supercars": [
+            ("Rolls-Royce", "Phantom EWB", 650000), ("Rolls-Royce", "Cullinan Black Badge", 450000),
+            ("Rolls-Royce", "Spectre", 420000), ("Bugatti", "Chiron Super Sport", 3800000),
+            ("Bugatti", "Tourbillon", 4500000), ("Ferrari", "Daytona SP3", 2200000),
+            ("Ferrari", "Purosangue", 400000), ("Lamborghini", "Revuelto", 600000),
+            ("Lamborghini", "Countach LPI 800-4", 2600000), ("Mercedes-Maybach", "S 680 Haute Voiture", 300000),
+            ("Mercedes-AMG", "G 63 4x4²", 350000)
+        ],
+        "✈️ Private Jets": [
+            ("Gulfstream", "G700 Flagship", 78000000), ("Gulfstream", "G800 Long Range", 81500000),
+            ("Bombardier", "Global 7500", 75000000), ("Bombardier", "Global 8000 (Mach 0.94)", 78000000),
+            ("Boeing", "BBJ 777-9 (Flying Palace)", 450000000), ("Boeing", "BBJ 787 Dreamliner", 250000000),
+            ("Dassault", "Falcon 10X", 75000000)
+        ],
+        "⚓ Mega Yachts": [
+            ("Lürssen", "Project Blue (160m)", 600000000), ("Lürssen", "Dilbar (156m)", 800000000),
+            ("Feadship", "Project 1010 (118m)", 300000000), ("Oceanco", "Y721 (Jeff Bezos)", 500000000),
+            ("Benetti", "Luminosity Hybrid", 280000000)
+        ],
+        "🏰 Global Estates": [
+            ("New York", "Central Park Tower Penthouse", 250000000), ("London", "The Holme, Regent's Park", 300000000),
+            ("Cote d'Azur", "Villa Leopolda", 750000000), ("Los Angeles", "The One Bel Air", 140000000),
+            ("Monaco", "Tour Odéon Sky Penthouse", 380000000), ("Hong Kong", "The Peak Estate", 280000000)
+        ],
+        "💎 Vault (Watches & Art)": [
+            ("Patek Philippe", "Grandmaster Chime 6300A", 31000000), ("Patek Philippe", "Nautilus Tiffany 5711", 6500000),
+            ("Rolex", "Paul Newman Daytona", 17800000), ("Jacob & Co", "Billionaire Watch", 18000000),
+            ("Art", "Da Vinci - Salvator Mundi", 450300000), ("Diamond", "The Pink Star (59.6ct)", 71200000)
+        ]
+    }
+    return db
 
-# --- Cars (60+ List Recovered) ---
-cars = [
-    ("Mercedes-AMG G 63", 190000), ("Mercedes-AMG SL 63", 185000), ("Maybach S 680", 250000),
-    ("Rolls-Royce Cullinan", 400000), ("Rolls-Royce Phantom", 600000), ("Rolls-Royce Spectre", 450000),
-    ("Ferrari SF90 Spider", 550000), ("Ferrari Purosangue", 400000), ("Ferrari LaFerrari", 3000000),
-    ("Lamborghini Revuelto", 600000), ("Lamborghini Urus", 270000), ("Lamborghini Countach", 2500000),
-    ("Porsche 911 Turbo S", 240000), ("Bugatti Chiron", 3500000), ("Bugatti Mistral", 5000000),
-    ("McLaren Speedtail", 2500000), ("Aston Martin Valkyrie", 3500000), ("Lincoln Navigator", 120000)
-]
-for n, p in cars:
-    DB["Car"].append({"name":n, "price":p, "img":get_img(n, "Car"), "opts":["Color","Wheels"]})
-
-# --- Jets ---
-jets = [
-    ("Gulfstream G700", 78000000), ("Gulfstream G650ER", 70000000), ("Gulfstream G800", 80000000),
-    ("Bombardier Global 7500", 75000000), ("Boeing BBJ 737", 100000000), ("Boeing BBJ 787", 250000000)
-]
-for n, p in jets:
-    DB["Jet"].append({"name":n, "price":p, "img":get_img(n, "Jet"), "opts":["Livery","Interior"]})
-
-# --- Yachts ---
-yachts = [
-    ("Lürssen Azzam (180m)", 600000000), ("Blohm+Voss Eclipse", 500000000), ("Lürssen Dilbar", 800000000),
-    ("Oceanco Jubilee", 300000000)
-]
-for n, p in yachts:
-    DB["Yacht"].append({"name":n, "price":p, "img":get_img(n, "Yacht"), "opts":["Helipad","Pool"]})
-
-# --- Watch & Luxury ---
-watches = [("Patek Philippe Nautilus", 150000), ("Rolex Daytona", 350000), ("Richard Mille", 500000)]
-for n, p in watches: DB["Watch"].append({"name":n, "price":p, "img":get_img(n, "Watch"), "opts":["Dial"]})
-
-lux = [("Hermès Birkin Himalaya", 200000), ("Hermès Kelly Black", 80000)]
-for n, p in lux: DB["Luxury"].append({"name":n, "price":p, "img":get_img(n, "Luxury"), "opts":["Leather"]})
+DB = create_db()
 
 # ==========================================
-# 4. 界面渲染
+# 3. 界面渲染 (仪表盘 + 列表)
 # ==========================================
+
+# --- 顶部私人银行仪表盘 ---
+st.markdown(f"""
+<div class="bank-card">
+    <div class="big-icon">💳 CENTURION PRIVATE BANK</div>
+    <div class="balance-title">Total Net Worth (Liquid)</div>
+    <div class="balance-amount">${st.session_state.cash:,.0f}</div>
+    <div>
+        <span class="income-tag">🚀 Passive Income Rate: +${PASSIVE_INCOME_BASE*2.5:,.0f} / Tick</span>
+        <span style="color: #4CAF50; margin-left: 10px;"> ▲ Last Tick: +${st.session_state.last_income:,.0f}</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# --- 侧边栏控制 ---
 with st.sidebar:
-    st.title("👑 WORLD OWNER")
-    st.metric("Balance", f"${st.session_state.cash:,.0f}")
-    if st.button("Reset Game"): 
+    st.header("🏦 Account Ops")
+    st.write("Your wealth grows automatically with every interaction derived from global business interests.")
+    if st.button("🔄 Force Refresh (Trigger Income)"):
+        st.rerun()
+    st.divider()
+    if st.button("⚠️ Reset Account (Wipe Data)"):
+        st.session_state.cash = INITIAL_CAPITAL
         st.session_state.inventory = []
-        st.session_state.cash = 10000000000
         st.rerun()
 
-tabs = st.tabs(["🏎️ Cars", "✈️ Jets", "⚓ Yachts", "⌚ Watches", "👜 Luxury", "💼 Assets"])
-cats = ["Car", "Jet", "Yacht", "Watch", "Luxury"]
+# --- 资产采购区 (纯文本列表) ---
+st.subheader("🛍️ Acquire Assets")
+tabs = st.tabs(DB.keys())
 
-for i, cat in enumerate(cats):
+for i, (cat_name, items) in enumerate(DB.items()):
     with tabs[i]:
-        for item in DB[cat]:
-            with st.container():
-                st.markdown(f"<div class='asset-card'>", unsafe_allow_html=True)
-                c1, c2 = st.columns([2, 3])
-                c1.image(item['img'])
-                with c2:
-                    st.markdown(f"### {item['name']}")
-                    st.markdown(f"**${item['price']:,}**")
-                    if st.button("BUY", key=f"btn_{item['name']}"): buy(item)
-                st.markdown("</div>", unsafe_allow_html=True)
+        for brand, name, price in items:
+            # 使用纯文本卡片渲染
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.markdown(f"""
+                <div class="text-asset-card">
+                    <div class="asset-brand">{brand}</div>
+                    <div class="asset-name">{name}</div>
+                    <div class="asset-price">${price:,}</div>
+                </div>
+                """, unsafe_allow_html=True)
+            with col2:
+                # 按钮垂直居中
+                st.write("") 
+                st.write("")
+                if st.button("BUY", key=f"buy_{name}"):
+                    buy({"brand":brand, "name":name, "price":price})
 
-with tabs[5]:
-    if not st.session_state.inventory: st.info("Inventory Empty")
+st.divider()
+
+# --- 我的资产清单 ---
+st.subheader("💼 Portfolio Inventory")
+if not st.session_state.inventory:
+    st.info("Your portfolio is currently empty. Start acquiring.")
+else:
     for i, item in enumerate(st.session_state.inventory):
-        with st.container():
-            c1, c2 = st.columns([1, 3])
-            c1.image(item['img'])
-            with c2:
-                st.write(f"**{item['name']}**")
-                if st.button("SELL", key=f"sell_{i}"): sell(i)
+        col1, col2 = st.columns([4, 1])
+        with col1:
+             st.markdown(f"""
+                <div class="text-asset-card" style="border-color: #4CAF50;">
+                    <div class="asset-brand">{item['brand']} (Owned)</div>
+                    <div class="asset-name">{item['name']}</div>
+                    <div class="asset-price">Value: ${item['price']:,}</div>
+                </div>
+                """, unsafe_allow_html=True)
+        with col2:
+            st.write("")
+            st.write("")
+            if st.button("LIQUIDATE", key=f"sell_{i}"): sell(i)
