@@ -12,7 +12,7 @@ st.markdown("""
     .asset-card {border: 1px solid #333; background: #111; border-radius: 12px; padding: 15px; margin-bottom: 15px;}
     h1, h2, h3 {color: #E5C1CD !important;} 
     p, span, div {color: #b0b0b0;}
-    /* 强制图片比例，防止显示不全 */
+    /* 强制图片比例 */
     [data-testid="stImage"] img {
         object-fit: cover; 
         aspect-ratio: 16/9; 
@@ -23,76 +23,90 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. 核心图库 (人工校对版 - 绝无风景照)
+# 1. 核心图库 (绝对无特斯拉)
 # ==========================================
 IMG = {
     # --- 豪车 ---
-    "g63": "https://images.unsplash.com/photo-1520031441872-265149a9e6e5", # 方盒子
-    "sl63": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8", # 敞篷跑车
-    "sedan": "https://images.unsplash.com/photo-1617788138017-80ad40651399", # 迈巴赫/S级
-    "rolls_suv": "https://images.unsplash.com/photo-1655132333039-47963d76756d", # 库里南
-    "rolls_car": "https://images.unsplash.com/photo-1631295868223-63265b40d9e4", # 幻影
-    "ferrari": "https://images.unsplash.com/photo-1592198084033-aade902d1aae", # 红色法拉利
-    "lambo": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b", # 兰博基尼
-    "porsche": "https://images.unsplash.com/photo-1503376763036-066120622c74", # 保时捷911
+    "g_wagon": "https://images.unsplash.com/photo-1520031441872-265149a9e6e5", # 奔驰G
+    "sl_amg": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8", # 奔驰敞篷
+    "maybach": "https://images.unsplash.com/photo-1617788138017-80ad40651399", # 迈巴赫前脸
+    "cullinan": "https://images.unsplash.com/photo-1655132333039-47963d76756d", # 库里南
+    "phantom": "https://images.unsplash.com/photo-1631295868223-63265b40d9e4", # 幻影
+    "ferrari": "https://images.unsplash.com/photo-1592198084033-aade902d1aae", # 法拉利
+    "lambo_suv": "https://images.unsplash.com/photo-1621996659490-6213b1859303", # Urus
+    "lambo_car": "https://images.unsplash.com/photo-1544636331-e26879cd4d9b", # 兰博超跑
+    "porsche": "https://images.unsplash.com/photo-1503376763036-066120622c74", # 911
     "bugatti": "https://images.unsplash.com/photo-1627454820574-fb40e69228d4", # 布加迪
+    "mclaren": "https://images.unsplash.com/photo-1621135802920-133df287f89c", # 迈凯伦
+    "aston": "https://images.unsplash.com/photo-1600712242805-5f78671d2434", # 阿斯顿马丁
     "suv_big": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf", # 领航员/路虎
+    "bmw": "https://images.unsplash.com/photo-1555215695-3004980adade", # 宝马
+    "audi": "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a", # 奥迪
     
-    # --- 飞机 (修复：不再是城市图) ---
-    "gulfstream": "https://images.unsplash.com/photo-1540962351504-03099e0a754b", # 湾流风格
-    "big_jet": "https://images.unsplash.com/photo-1559081556-98d75e032532", # 大型客机/BBJ (真飞机)
-    "bombardier": "https://images.unsplash.com/photo-1583417319070-4a69db38a482", # 庞巴迪风格
+    # --- 飞机 ---
+    "g700": "https://images.unsplash.com/photo-1540962351504-03099e0a754b", # 湾流内饰/窗
+    "g_ext": "https://images.unsplash.com/photo-1474302770737-173ee21bab63", # 湾流外观
+    "bbj": "https://images.unsplash.com/photo-1559081556-98d75e032532", # 波音大客机
+    "bombardier": "https://images.unsplash.com/photo-1583417319070-4a69db38a482", # 庞巴迪
     
-    # --- 游艇 (修复：不再是黑图) ---
-    "yacht_mega": "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13", # 巨型游艇 (Azzam级)
-    "yacht_sport": "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a", # 运动游艇
+    # --- 游艇 ---
+    "yacht_huge": "https://images.unsplash.com/photo-1569263979104-865ab7cd8d13", # 巨型游艇
+    "yacht_std": "https://images.unsplash.com/photo-1605281317010-fe5ffe79b9b4", # 标准超游
     
     # --- 房产 ---
     "tower": "https://images.unsplash.com/photo-1486325212027-8081e485255e", # 摩天大楼
-    "villa": "https://images.unsplash.com/photo-1613490493576-7fde63acd811", # 现代豪宅
-    "courtyard": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Siheyuan_Beijing.jpg/800px-Siheyuan_Beijing.jpg", # 四合院
+    "mansion": "https://images.unsplash.com/photo-1613490493576-7fde63acd811", # 豪宅
+    "courtyard": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Siheyuan_Beijing.jpg/800px-Siheyuan_Beijing.jpg",
     
-    # --- 奢侈品 (修复：图片区分) ---
-    "patek": "https://images.unsplash.com/photo-1639037688267-3323a73df667", # 鹦鹉螺风格
-    "rolex": "https://images.unsplash.com/photo-1622434641406-a158105c9168", # 劳力士风格
-    "rm": "https://images.unsplash.com/photo-1600003014608-c2ccc1570a65", # 复杂镂空表
-    "birkin_white": "https://images.unsplash.com/photo-1584917865442-de89df76afd3", # 浅色铂金包
-    "kelly_black": "https://images.unsplash.com/photo-1594223274512-ad4803739b7c", # 深色包
+    # --- 奢侈品 ---
+    "patek": "https://images.unsplash.com/photo-1639037688267-3323a73df667", # 鹦鹉螺
+    "rolex": "https://images.unsplash.com/photo-1622434641406-a158105c9168", # 迪通拿
+    "rm": "https://images.unsplash.com/photo-1600003014608-c2ccc1570a65", # 镂空表
+    "birkin_him": "https://images.unsplash.com/photo-1584917865442-de89df76afd3", # 浅色包
+    "kelly": "https://images.unsplash.com/photo-1594223274512-ad4803739b7c", # 深色包
     
-    "default": "https://images.unsplash.com/photo-1550989460-0adf9ea622e2"
+    "default": "https://images.unsplash.com/photo-1550989460-0adf9ea622e2" # 黑色背景
 }
 
 def get_img(name, cat):
-    n = name.lower()
+    n = name.lower() # 只转小写，不删空格
+    
     # Cars
     if cat == "Car":
-        if "g63" in n or "g800" in n: return IMG["g63"]
-        if "sl63" in n or "roadster" in n: return IMG["sl63"]
-        if "cullinan" in n or "dbx" in n: return IMG["rolls_suv"]
-        if "rolls" in n or "phantom" in n or "spectre" in n: return IMG["rolls_car"]
+        if "g 63" in n or "g800" in n: return IMG["g_wagon"]
+        if "sl" in n or "roadster" in n: return IMG["sl_amg"]
+        if "maybach" in n or "s 680" in n or "pullman" in n: return IMG["maybach"]
+        if "cullinan" in n or "dbx" in n: return IMG["cullinan"]
+        if "phantom" in n or "spectre" in n or "ghost" in n: return IMG["phantom"]
         if "ferrari" in n or "sf90" in n: return IMG["ferrari"]
-        if "lambo" in n: return IMG["lambo"]
+        if "urus" in n: return IMG["lambo_suv"]
+        if "lambo" in n or "revuelto" in n: return IMG["lambo_car"]
         if "porsche" in n: return IMG["porsche"]
         if "bugatti" in n or "chiron" in n: return IMG["bugatti"]
+        if "mclaren" in n: return IMG["mclaren"]
+        if "aston" in n: return IMG["aston"]
         if "navigator" in n or "escalade" in n or "range" in n: return IMG["suv_big"]
-        return IMG["sedan"] # 默认轿车
+        if "bmw" in n: return IMG["bmw"]
+        if "audi" in n: return IMG["audi"]
+        return IMG["maybach"] # 默认给个奔驰脸
     
     # Jets
     if cat == "Jet":
-        if "bbj" in n or "787" in n or "777" in n: return IMG["big_jet"] # 波音必用大飞机图
-        if "global" in n: return IMG["bombardier"]
-        return IMG["gulfstream"]
+        if "bbj" in n or "787" in n or "777" in n: return IMG["bbj"]
+        if "g700" in n: return IMG["g700"] # 湾流特写
+        if "gulfstream" in n: return IMG["g_ext"] # 湾流外观
+        return IMG["bombardier"]
         
     # Yachts
     if cat == "Yacht":
-        if "azzam" in n or "eclipse" in n or "dilbar" in n: return IMG["yacht_mega"]
-        return IMG["yacht_sport"]
+        if "azzam" in n or "eclipse" in n or "dilbar" in n: return IMG["yacht_huge"]
+        return IMG["yacht_std"]
         
     # Estate
     if cat == "Estate":
-        if "tower" in n or "101" in n or "penthouse" in n: return IMG["tower"]
+        if "tower" in n or "101" in n or "penthouse" in n or "sky" in n: return IMG["tower"]
         if "courtyard" in n: return IMG["courtyard"]
-        return IMG["villa"]
+        return IMG["mansion"]
     
     # Watch
     if cat == "Watch":
@@ -102,8 +116,8 @@ def get_img(name, cat):
         
     # Luxury
     if cat == "Luxury":
-        if "himalaya" in n or "white" in n: return IMG["birkin_white"]
-        return IMG["kelly_black"]
+        if "himalaya" in n or "white" in n: return IMG["birkin_him"]
+        return IMG["kelly"]
         
     return IMG["default"]
 
@@ -125,12 +139,12 @@ def sell(i):
     st.rerun()
 
 # ==========================================
-# 3. 完整数据库 (Full Data)
+# 3. 完整数据库
 # ==========================================
 def create_db():
     db = {"Car":[], "Jet":[], "Yacht":[], "Estate":[], "Watch":[], "Luxury":[]}
     
-    # --- Cars (部分精选展示，实际全量) ---
+    # --- Cars ---
     cars = [
         ("Mercedes-AMG G63", 190000), ("Mercedes-AMG SL63", 185000), ("Maybach S680", 250000),
         ("Rolls-Royce Cullinan", 400000), ("Rolls-Royce Phantom", 600000), ("Rolls-Royce Spectre", 450000),
@@ -138,55 +152,54 @@ def create_db():
         ("Lamborghini Revuelto", 600000), ("Lamborghini Urus", 270000), 
         ("Porsche 911 Turbo S", 240000), ("Bugatti Chiron", 3500000), ("Bugatti Mistral", 5000000),
         ("McLaren Speedtail", 2500000), ("Aston Martin Valkyrie", 3500000),
-        ("Lincoln Navigator", 120000), ("Range Rover SV", 250000), ("Cadillac Escalade", 150000)
+        ("Lincoln Navigator", 120000), ("Range Rover SV", 250000), ("Cadillac Escalade", 150000),
+        ("BMW M4 Competition", 95000), ("Audi RS6 Avant", 130000)
     ]
     for n, p in cars:
-        db["Car"].append({"name":n, "price":p, "img":get_img(n, "Car"), "opts":["Paint","Interior","Wheels"]})
+        db["Car"].append({"name":n, "price":p, "img":get_img(n, "Car"), "opts":["Paint","Interior"]})
 
-    # --- Jets (全系) ---
+    # --- Jets ---
     jets = [
-        ("Gulfstream G700", 78000000), ("Gulfstream G650ER", 70000000), ("Gulfstream G800", 80000000),
-        ("Bombardier Global 7500", 75000000), ("Bombardier Global 8000", 78000000),
-        ("Boeing BBJ MAX 7", 100000000), ("Boeing BBJ 787 Dreamliner", 250000000), ("Boeing BBJ 777X", 420000000),
-        ("Dassault Falcon 10X", 75000000)
+        ("Gulfstream G700", 78000000), ("Gulfstream G650ER", 70000000), ("Gulfstream G280", 25000000),
+        ("Bombardier Global 7500", 75000000), ("Dassault Falcon 10X", 75000000),
+        ("Boeing BBJ MAX 7", 100000000), ("Boeing BBJ 787 Dreamliner", 250000000)
     ]
     for n, p in jets:
-        db["Jet"].append({"name":n, "price":p, "img":get_img(n, "Jet"), "opts":["Layout","Defense","Livery"]})
+        db["Jet"].append({"name":n, "price":p, "img":get_img(n, "Jet"), "opts":["Layout","Livery"]})
 
     # --- Yachts ---
     yachts = [
         ("Lürssen Azzam (180m)", 600000000), ("Blohm+Voss Eclipse", 500000000), ("Lürssen Dilbar", 800000000),
-        ("Oceanco Jubilee", 300000000), ("Feadship Anna", 250000000), ("Lürssen Flying Fox", 400000000)
+        ("Oceanco Jubilee", 300000000), ("Feadship Anna", 250000000)
     ]
     for n, p in yachts:
-        db["Yacht"].append({"name":n, "price":p, "img":get_img(n, "Yacht"), "opts":["Helipad","Submarine","Pool"]})
+        db["Yacht"].append({"name":n, "price":p, "img":get_img(n, "Yacht"), "opts":["Helipad","Pool"]})
 
     # --- Estate ---
     estates = [
         ("NY Central Park Tower PH", 250000000), ("Beverly Hills The One", 145000000),
         ("Shanghai Tan Gong Villa", 100000000), ("Hong Kong Barker Rd", 280000000),
-        ("Beijing Houhai Courtyard", 180000000), ("Shenzhen Bay No.1", 85000000),
-        ("London One Hyde Park", 120000000), ("Monaco Odeon Tower", 380000000)
+        ("Beijing Houhai Courtyard", 180000000), ("Shenzhen Bay No.1", 85000000)
     ]
     for n, p in estates:
-        db["Estate"].append({"name":n, "price":p, "img":get_img(n, "Estate"), "opts":["Furniture","Art","Security"]})
+        db["Estate"].append({"name":n, "price":p, "img":get_img(n, "Estate"), "opts":["Furniture","Security"]})
 
-    # --- Watches & Luxury ---
+    # --- Watches ---
     watches = [
         ("Patek Philippe Nautilus", 150000), ("Patek Philippe Grandmaster", 2500000),
         ("Rolex Daytona Rainbow", 350000), ("Rolex Paul Newman", 200000),
-        ("Richard Mille RM 52-01", 800000), ("Audemars Piguet Royal Oak", 80000)
+        ("Richard Mille RM 52-01", 800000)
     ]
     for n, p in watches:
-        db["Watch"].append({"name":n, "price":p, "img":get_img(n, "Watch"), "opts":["Material","Dial"]})
+        db["Watch"].append({"name":n, "price":p, "img":get_img(n, "Watch"), "opts":["Material"]})
 
+    # --- Luxury ---
     lux = [
         ("Hermès Birkin Himalaya", 200000), ("Hermès Birkin Faubourg", 150000),
-        ("Hermès Kelly Crocodile", 80000), ("Hermès Constance", 40000),
-        ("Louis Vuitton Trunk", 60000)
+        ("Hermès Kelly Crocodile", 80000), ("Louis Vuitton Trunk", 60000)
     ]
     for n, p in lux:
-        db["Luxury"].append({"name":n, "price":p, "img":get_img(n, "Luxury"), "opts":["Leather","Hardware"]})
+        db["Luxury"].append({"name":n, "price":p, "img":get_img(n, "Luxury"), "opts":["Leather"]})
 
     return db
 
