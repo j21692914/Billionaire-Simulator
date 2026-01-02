@@ -4,164 +4,241 @@ import random
 import time
 
 # ==========================================
-# 0. 极简奢华UI配置 (黑金风格，无图)
+# 0. 极简奢华UI配置 (黑金风格)
 # ==========================================
 st.set_page_config(page_title="Centurion Bank OS", layout="wide", page_icon="💳")
 
 st.markdown("""
 <style>
-    /* 全局深色背景 */
-    .stApp {
-        background-color: #000000;
-        color: #e0e0e0;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    }
+    .stApp {background-color: #000000; color: #e0e0e0; font-family: 'Helvetica Neue', sans-serif;}
+    [data-testid="stSidebar"] {background-color: #0a0a0a; border-right: 1px solid #222;}
+    h1, h2, h3, h4, h5 {color: #D4AF37 !important; letter-spacing: 1px;} 
     
-    /* 侧边栏 */
-    [data-testid="stSidebar"] {
-        background-color: #0a0a0a;
-        border-right: 1px solid #222;
-    }
-    
-    /* 标题和文本 */
-    h1, h2, h3 { color: #D4AF37 !important; letter-spacing: 1px; } /* 金色标题 */
-    .big-icon { font-size: 3rem; margin-bottom: 10px; }
-    
-    /* --- 私人银行卡片风格 --- */
+    /* 银行卡片 */
     .bank-card {
         background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
         border: 2px solid #D4AF37;
         border-radius: 20px;
-        padding: 30px;
+        padding: 40px;
         text-align: center;
-        box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
-        margin-bottom: 30px;
+        box-shadow: 0 10px 40px rgba(212, 175, 55, 0.15);
+        margin-bottom: 40px;
     }
-    .balance-title {
-        color: #888;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        font-size: 0.9rem;
-    }
+    .balance-title {color: #888; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem;}
     .balance-amount {
-        font-family: 'Courier New', monospace;
-        font-size: 4rem;
-        font-weight: bold;
-        color: #D4AF37;
-        text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        margin: 15px 0;
+        font-family: 'Courier New', monospace; font-size: 4.5rem; font-weight: bold; 
+        color: #D4AF37; text-shadow: 0 0 15px rgba(212, 175, 55, 0.4); margin: 20px 0;
     }
-    .income-tag {
-        background-color: rgba(76, 175, 80, 0.1);
-        color: #4CAF50;
-        padding: 5px 15px;
-        border-radius: 15px;
-        font-size: 0.8rem;
-    }
+    .income-tag {color: #4CAF50; background: rgba(76, 175, 80, 0.1); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem;}
     
-    /* --- 资产列表卡片风格 (纯文本) --- */
+    /* 资产条目 */
     .text-asset-card {
-        background-color: #111;
-        border-left: 4px solid #D4AF37;
-        padding: 20px;
-        margin-bottom: 15px;
-        border-radius: 8px;
-        transition: transform 0.2s;
+        background-color: #111; border-left: 3px solid #333; padding: 20px; 
+        margin-bottom: 12px; border-radius: 6px; transition: all 0.2s;
     }
-    .text-asset-card:hover {
-        transform: translateX(5px);
-        background-color: #161616;
-    }
-    .asset-name { font-size: 1.2rem; font-weight: bold; color: #fff; }
-    .asset-price { font-family: monospace; color: #D4AF37; font-size: 1.1rem; }
-    .asset-brand { color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;}
+    .text-asset-card:hover {background-color: #1a1a1a; border-left-color: #D4AF37;}
     
-    /* 按钮美化 */
+    .asset-header {display: flex; justify-content: space-between; align-items: center;}
+    .asset-brand {color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;}
+    .asset-name {font-size: 1.2rem; font-weight: 600; color: #fff; margin: 5px 0;}
+    .asset-price {font-family: monospace; color: #D4AF37; font-size: 1.1rem;}
+    
+    /* 配置单样式 */
+    .config-box {
+        background-color: #0e0e0e; border: 1px solid #333; padding: 15px; margin-top: 15px; border-radius: 8px;
+    }
+    .config-title {font-size: 0.9rem; color: #888; margin-bottom: 10px; text-transform: uppercase;}
+    
+    /* 按钮 */
     div.stButton > button {
-        background-color: transparent;
-        border: 1px solid #D4AF37;
-        color: #D4AF37;
-        border-radius: 5px;
-        padding: 5px 15px;
+        background: transparent; border: 1px solid #D4AF37; color: #D4AF37; 
+        border-radius: 4px; padding: 8px 20px; width: 100%; transition: all 0.2s;
     }
     div.stButton > button:hover {
-        background-color: #D4AF37;
-        color: black;
-        border-color: #D4AF37;
+        background: #D4AF37; color: #000;
     }
-
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. 核心逻辑：银行系统与被动收入
+# 1. 银行系统逻辑
 # ==========================================
-# 初始资金：100亿
 INITIAL_CAPITAL = 10000000000
-# 被动收入速率：每次操作赚取 $500,000 到 $2,000,000 不等
-PASSIVE_INCOME_BASE = 500000 
+PASSIVE_INCOME_BASE = 800000 
 
 if 'cash' not in st.session_state:
     st.session_state.cash = INITIAL_CAPITAL
     st.session_state.inventory = []
     st.session_state.last_income = 0
 
-# --- 被动收入引擎 ---
-# 每次页面重新加载（任何点击操作）都会触发
-income_this_tick = random.randint(PASSIVE_INCOME_BASE, PASSIVE_INCOME_BASE * 4)
+# 自动复利增长
+income_this_tick = random.randint(PASSIVE_INCOME_BASE, PASSIVE_INCOME_BASE * 5)
 st.session_state.cash += income_this_tick
 st.session_state.last_income = income_this_tick
-# 弹出提示
-st.toast(f"📈 Global Business Income: +${income_this_tick:,}")
+st.toast(f"📈 Interest Paid: +${income_this_tick:,}")
 
+def buy_asset(brand, name, base_price, selected_options, total_cost):
+    if st.session_state.cash >= total_cost:
+        st.session_state.cash -= total_cost
+        st.session_state.inventory.append({
+            "brand": brand, 
+            "name": name, 
+            "price": total_cost,
+            "specs": selected_options
+        })
+        st.success(f"✅ ORDER CONFIRMED: {name}")
+        time.sleep(1)
+        st.rerun()
+    else:
+        st.error("❌ INSUFFICIENT FUNDS")
 
-def buy(item):
-    if st.session_state.cash >= item['price']:
-        st.session_state.cash -= item['price']
-        st.session_state.inventory.append(item)
-        st.toast(f"✅ Acquired: {item['name']}")
-        st.rerun() # 强制刷新以更新余额显示
-
-def sell(i):
+def sell_asset(i):
     item = st.session_state.inventory.pop(i)
-    st.session_state.cash += item['price'] # 原价卖出
-    st.toast(f"💰 Sold: {item['name']}")
+    st.session_state.cash += item['price']
+    st.toast(f"💰 Liquidated: {item['name']}")
     st.rerun()
 
 # ==========================================
-# 2. 纯文本数据库 (无图版)
+# 2. 超级配置单 (每一类 > 10 项)
+# ==========================================
+# 格式: ("选项名称", 额外价格)
+CONFIG_MENUS = {
+    "Car": [
+        ("Matte Black Paint / 哑光黑车漆", 15000),
+        ("23-inch Forged Wheels / 23寸锻造轮毂", 22000),
+        ("Carbon Ceramic Brakes / 碳陶刹车", 18000),
+        ("Hermès Leather Interior / 爱马仕真皮内饰", 55000),
+        ("Starlight Headliner / 星空顶", 28000),
+        ("Bespoke Audio System / 顶级音响", 12000),
+        ("Rear Seat Entertainment / 后排娱乐系统", 15000),
+        ("Champagne Cooler / 香槟冰箱", 8000),
+        ("Gold Plated Spirit of Ecstasy / 镀金车标", 5000),
+        ("Bulletproof Glass (B6) / 防弹玻璃", 85000),
+        ("Exposed Carbon Fiber Body / 全碳纤维车身", 150000),
+        ("Titanium Exhaust / 钛合金排气", 25000),
+        ("Personalized Treadplates / 个性化迎宾踏板", 3000)
+    ],
+    "Jet": [
+        ("Master Bedroom Suite / 主卧套房", 2500000),
+        ("Full Stand-up Shower / 独立淋浴间", 1500000),
+        ("Conference Room (6 Pax) / 6人会议室", 800000),
+        ("Ka-Band High Speed WiFi / 极速卫星网", 500000),
+        ("Anti-Missile System / 反导防御系统", 4500000),
+        ("Exterior Custom Livery / 定制涂装", 300000),
+        ("Gold Plated Sink Hardware / 镀金卫浴", 150000),
+        ("Medical Bay / 医疗室", 1200000),
+        ("Crew Rest Area / 机组休息区", 500000),
+        ("Galley with Pizza Oven / 披萨烤箱厨房", 250000),
+        ("Cinema Projector / 影院投影", 180000),
+        ("Humidification System / 增湿系统", 350000),
+        ("Encrypted Comms / 加密通讯", 2000000)
+    ],
+    "Yacht": [
+        ("Helipad (Reinforced) / 加固停机坪", 5000000),
+        ("Beach Club Extension / 亲水平台扩展", 2500000),
+        ("Glass Bottom Pool / 玻璃底泳池", 3000000),
+        ("Mini Submarine (Triton) / 迷你潜水艇", 4500000),
+        ("Anti-Drone Shield / 反无人机盾", 1500000),
+        ("Underwater Nemo Room / 水下观景厅", 6000000),
+        ("Cinema (IMAX Certified) / IMAX影院", 2000000),
+        ("Gym & Spa Center / 健身水疗中心", 1200000),
+        ("Jet Ski Garage (Full) / 摩托艇库(满配)", 800000),
+        ("Stabilizers (Zero Speed) / 零速稳定器", 1500000),
+        ("Bulletproof Bridge / 防弹驾驶台", 1000000),
+        ("Elevator (Glass) / 玻璃电梯", 1800000),
+        ("Live Seafood Tank / 活海鲜缸", 50000)
+    ],
+    "Estate": [
+        ("Panic Room / 恐慌室(避难所)", 2000000),
+        ("Underground Vault / 地下金库", 1500000),
+        ("Wine Cellar (stocked) / 满配酒窖", 3000000),
+        ("Home Theatre (4D) / 4D家庭影院", 800000),
+        ("Smart Home AI / 全屋智能AI", 500000),
+        ("Heated Driveway / 车道加热", 200000),
+        ("Infinity Pool / 无边泳池", 1200000),
+        ("Staff Quarters / 佣人房独立栋", 800000),
+        ("Professional Kitchen / 米其林级厨房", 600000),
+        ("Art Gallery Lighting / 艺术馆级灯光", 300000),
+        ("Private Bowling Alley / 私人保龄球道", 400000),
+        ("Helipad / 直升机坪", 1000000),
+        ("Japanese Garden / 枯山水庭院", 1500000)
+    ],
+    "Vault": [
+        ("Diamond Setting / 钻石镶嵌", 250000),
+        ("Platinum Bracelet / 铂金表带", 150000),
+        ("Tourbillon Movement / 陀飞轮机芯", 500000),
+        ("Custom Engraving / 个性化刻字", 5000),
+        ("Crocodile Strap / 鳄鱼皮表带", 8000),
+        ("Sapphire Case / 蓝宝石表壳", 1200000),
+        ("Meteorite Dial / 陨石盘面", 50000),
+        ("Insurance (Lifetime) / 终身保险", 100000),
+        ("Museum Display Box / 博物馆级展示盒", 20000),
+        ("Certificate of Origin / 原产地证书", 0),
+        ("Extra Links / 备用表节", 2000),
+        ("Polishing Service / 终身抛光", 15000)
+    ]
+}
+
+# ==========================================
+# 3. 资产数据库
 # ==========================================
 def create_db():
-    # 格式: (品牌, 型号, 价格)
     db = {
-        "🚗 Supercars": [
-            ("Rolls-Royce", "Phantom EWB", 650000), ("Rolls-Royce", "Cullinan Black Badge", 450000),
-            ("Rolls-Royce", "Spectre", 420000), ("Bugatti", "Chiron Super Sport", 3800000),
-            ("Bugatti", "Tourbillon", 4500000), ("Ferrari", "Daytona SP3", 2200000),
-            ("Ferrari", "Purosangue", 400000), ("Lamborghini", "Revuelto", 600000),
-            ("Lamborghini", "Countach LPI 800-4", 2600000), ("Mercedes-Maybach", "S 680 Haute Voiture", 300000),
-            ("Mercedes-AMG", "G 63 4x4²", 350000)
+        "Car": [
+            ("Rolls-Royce", "Phantom VIII EWB", 650000),
+            ("Rolls-Royce", "Cullinan Black Badge", 480000),
+            ("Bugatti", "Chiron Super Sport", 3900000),
+            ("Bugatti", "Tourbillon", 4500000),
+            ("Ferrari", "Daytona SP3", 2200000),
+            ("Ferrari", "Purosangue", 400000),
+            ("Lamborghini", "Revuelto", 600000),
+            ("Mercedes-Maybach", "S 680 Haute Voiture", 300000),
+            ("Mercedes-AMG", "G 63 4x4²", 350000),
+            ("Aston Martin", "Valkyrie", 3500000),
+            ("Koenigsegg", "Jesko Absolut", 3400000),
+            ("Pagani", "Utopia", 2500000)
         ],
-        "✈️ Private Jets": [
-            ("Gulfstream", "G700 Flagship", 78000000), ("Gulfstream", "G800 Long Range", 81500000),
-            ("Bombardier", "Global 7500", 75000000), ("Bombardier", "Global 8000 (Mach 0.94)", 78000000),
-            ("Boeing", "BBJ 777-9 (Flying Palace)", 450000000), ("Boeing", "BBJ 787 Dreamliner", 250000000),
-            ("Dassault", "Falcon 10X", 75000000)
+        "Jet": [
+            ("Gulfstream", "G700 Flagship", 78000000),
+            ("Gulfstream", "G800 Long Range", 81500000),
+            ("Bombardier", "Global 7500", 75000000),
+            ("Bombardier", "Global 8000", 78000000),
+            ("Boeing", "BBJ 777-9", 450000000),
+            ("Boeing", "BBJ 787-9", 280000000),
+            ("Airbus", "ACJ TwoTwenty", 90000000),
+            ("Dassault", "Falcon 10X", 75000000),
+            ("Embraer", "Lineage 1000E", 53000000)
         ],
-        "⚓ Mega Yachts": [
-            ("Lürssen", "Project Blue (160m)", 600000000), ("Lürssen", "Dilbar (156m)", 800000000),
-            ("Feadship", "Project 1010 (118m)", 300000000), ("Oceanco", "Y721 (Jeff Bezos)", 500000000),
-            ("Benetti", "Luminosity Hybrid", 280000000)
+        "Yacht": [
+            ("Lürssen", "Azzam (180m)", 600000000),
+            ("Lürssen", "Blue (160m)", 600000000),
+            ("Lürssen", "Dilbar (156m)", 800000000),
+            ("Blohm+Voss", "Eclipse (162m)", 1200000000),
+            ("Feadship", "Project 1010", 300000000),
+            ("Oceanco", "Y721 Koru", 500000000),
+            ("Benetti", "Luminosity", 280000000),
+            ("Nobiskrug", "Sailing Yacht A", 450000000)
         ],
-        "🏰 Global Estates": [
-            ("New York", "Central Park Tower Penthouse", 250000000), ("London", "The Holme, Regent's Park", 300000000),
-            ("Cote d'Azur", "Villa Leopolda", 750000000), ("Los Angeles", "The One Bel Air", 140000000),
-            ("Monaco", "Tour Odéon Sky Penthouse", 380000000), ("Hong Kong", "The Peak Estate", 280000000)
+        "Estate": [
+            ("New York", "Central Park Tower PH", 250000000),
+            ("London", "The Holme Regent's Park", 300000000),
+            ("France", "Villa Leopolda", 750000000),
+            ("Los Angeles", "The One Bel Air", 140000000),
+            ("Monaco", "Tour Odéon Sky PH", 380000000),
+            ("Hong Kong", "The Peak Barker Rd", 280000000),
+            ("Mumbai", "Antilia", 2000000000),
+            ("Shanghai", "Tan Gong Villa", 100000000),
+            ("Beijing", "Houhai Courtyard", 180000000)
         ],
-        "💎 Vault (Watches & Art)": [
-            ("Patek Philippe", "Grandmaster Chime 6300A", 31000000), ("Patek Philippe", "Nautilus Tiffany 5711", 6500000),
-            ("Rolex", "Paul Newman Daytona", 17800000), ("Jacob & Co", "Billionaire Watch", 18000000),
-            ("Art", "Da Vinci - Salvator Mundi", 450300000), ("Diamond", "The Pink Star (59.6ct)", 71200000)
+        "Vault": [
+            ("Patek Philippe", "Grandmaster Chime", 31000000),
+            ("Patek Philippe", "Nautilus Tiffany", 6500000),
+            ("Rolex", "Paul Newman Daytona", 17800000),
+            ("Jacob & Co", "Billionaire Watch", 18000000),
+            ("Graff", "Diamonds Hallucination", 55000000),
+            ("Art", "Da Vinci - Salvator Mundi", 450300000),
+            ("Art", "De Kooning - Interchange", 300000000),
+            ("Gem", "The Pink Star", 71200000)
         ]
     }
     return db
@@ -169,76 +246,98 @@ def create_db():
 DB = create_db()
 
 # ==========================================
-# 3. 界面渲染 (仪表盘 + 列表)
+# 4. 界面渲染
 # ==========================================
 
-# --- 顶部私人银行仪表盘 ---
+# --- 私人银行卡片 ---
 st.markdown(f"""
 <div class="bank-card">
-    <div class="big-icon">💳 CENTURION PRIVATE BANK</div>
-    <div class="balance-title">Total Net Worth (Liquid)</div>
+    <div style="font-size: 3rem; margin-bottom: 15px;">💳 CENTURION PRIVATE BANK</div>
+    <div class="balance-title">TOTAL NET WORTH (LIQUID)</div>
     <div class="balance-amount">${st.session_state.cash:,.0f}</div>
-    <div>
-        <span class="income-tag">🚀 Passive Income Rate: +${PASSIVE_INCOME_BASE*2.5:,.0f} / Tick</span>
-        <span style="color: #4CAF50; margin-left: 10px;"> ▲ Last Tick: +${st.session_state.last_income:,.0f}</span>
+    <div style="display: flex; justify-content: center; gap: 20px; align-items: center;">
+        <span class="income-tag">🚀 Yield: +${PASSIVE_INCOME_BASE*2.5:,.0f} / Tick</span>
+        <span style="color: #4CAF50; font-weight: bold;">▲ Last: +${st.session_state.last_income:,.0f}</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# --- 侧边栏控制 ---
+# --- 侧边栏 ---
 with st.sidebar:
-    st.header("🏦 Account Ops")
-    st.write("Your wealth grows automatically with every interaction derived from global business interests.")
-    if st.button("🔄 Force Refresh (Trigger Income)"):
-        st.rerun()
+    st.header("⚙️ Account Ops")
+    if st.button("🔄 Refresh Market"): st.rerun()
     st.divider()
-    if st.button("⚠️ Reset Account (Wipe Data)"):
+    if st.button("⚠️ Reset Portfolio"):
         st.session_state.cash = INITIAL_CAPITAL
         st.session_state.inventory = []
         st.rerun()
 
-# --- 资产采购区 (纯文本列表) ---
-st.subheader("🛍️ Acquire Assets")
+# --- 采购区 ---
+st.subheader("🛍️ ACQUISITION MARKET")
 tabs = st.tabs(DB.keys())
 
-for i, (cat_name, items) in enumerate(DB.items()):
+for i, (cat, items) in enumerate(DB.items()):
     with tabs[i]:
-        for brand, name, price in items:
-            # 使用纯文本卡片渲染
-            col1, col2 = st.columns([4, 1])
-            with col1:
+        for brand, name, base_price in items:
+            # 渲染每个资产的卡片
+            with st.container():
                 st.markdown(f"""
                 <div class="text-asset-card">
-                    <div class="asset-brand">{brand}</div>
-                    <div class="asset-name">{name}</div>
-                    <div class="asset-price">${price:,}</div>
+                    <div class="asset-info">
+                        <div class="asset-brand">{brand}</div>
+                        <div class="asset-name">{name}</div>
+                        <div class="asset-price">Base: ${base_price:,}</div>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
-            with col2:
-                # 按钮垂直居中
-                st.write("") 
-                st.write("")
-                if st.button("BUY", key=f"buy_{name}"):
-                    buy({"brand":brand, "name":name, "price":price})
+                
+                # 配置展开区域
+                with st.expander(f"🛠️ Configure & Purchase: {name}"):
+                    st.markdown("<div class='config-title'>Select Options (Each adds to cost)</div>", unsafe_allow_html=True)
+                    
+                    # 获取该类别的配置单
+                    options_list = CONFIG_MENUS.get(cat, CONFIG_MENUS["Car"])
+                    selected_opts = []
+                    current_price = base_price
+                    
+                    # 生成复选框
+                    c1, c2 = st.columns(2)
+                    for idx, (opt_name, opt_price) in enumerate(options_list):
+                        col = c1 if idx % 2 == 0 else c2
+                        if col.checkbox(f"{opt_name} (+${opt_price:,})", key=f"{name}_{idx}"):
+                            selected_opts.append(opt_name)
+                            current_price += opt_price
+                    
+                    st.divider()
+                    st.markdown(f"#### Total Price: :green[${current_price:,}]")
+                    if st.button(f"CONFIRM ORDER - ${current_price:,}", key=f"btn_{name}"):
+                        buy_asset(brand, name, base_price, selected_options=selected_opts, total_cost=current_price)
 
 st.divider()
 
-# --- 我的资产清单 ---
-st.subheader("💼 Portfolio Inventory")
+# --- 资产清单 ---
+st.subheader(f"💼 PORTFOLIO ({len(st.session_state.inventory)} Assets)")
+
 if not st.session_state.inventory:
-    st.info("Your portfolio is currently empty. Start acquiring.")
+    st.caption("Your portfolio is currently empty. Acquire assets above.")
 else:
-    for i, item in enumerate(st.session_state.inventory):
-        col1, col2 = st.columns([4, 1])
-        with col1:
-             st.markdown(f"""
-                <div class="text-asset-card" style="border-color: #4CAF50;">
-                    <div class="asset-brand">{item['brand']} (Owned)</div>
+    for i, item in enumerate(reversed(st.session_state.inventory)):
+        with st.container():
+            st.markdown(f"""
+            <div class="text-asset-card" style="border-left-color: #4CAF50;">
+                <div class="asset-info">
+                    <div class="asset-brand">{item['brand']} <span style="color:#4CAF50; margin-left:10px;">● OWNED</span></div>
                     <div class="asset-name">{item['name']}</div>
-                    <div class="asset-price">Value: ${item['price']:,}</div>
+                    <div class="asset-price">Valuation: ${item['price']:,}</div>
                 </div>
-                """, unsafe_allow_html=True)
-        with col2:
-            st.write("")
-            st.write("")
-            if st.button("LIQUIDATE", key=f"sell_{i}"): sell(i)
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # 显示已选配置
+            if item['specs']:
+                with st.expander("View Specs"):
+                    for s in item['specs']:
+                        st.write(f"- {s}")
+            
+            if st.button("LIQUIDATE ASSET", key=f"sell_{i}"):
+                sell_asset(len(st.session_state.inventory)-1-i)
