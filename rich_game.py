@@ -40,67 +40,65 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-SAVE_FILE = "game_save.json" # GitHub 环境下简化路径
+SAVE_FILE = "game_save.json" 
 
 # ==========================================
-# 1. 精准图源映射 (手动校准版)
+# 1. 精准图源映射 (手动校准版 - 告别大叔图)
 # ==========================================
 def get_real_img(name, cat):
     name = name.lower()
     
     # --- 🏎️ 豪车精准图 ---
     if cat == "Car":
-        if "sl 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg/1200px-Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg"
-        if "g 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg/1200px-Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg"
-        if "gt 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Mercedes-AMG_GT_63_S_E_Performance_IAA_2021_1X7A0168.jpg/1200px-Mercedes-AMG_GT_63_S_E_Performance_IAA_2021_1X7A0168.jpg"
-        if "s 680" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg/1200px-Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg"
-        if "pullman" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Mercedes-Maybach_S_600_Pullman_Genf_2018.jpg/1200px-Mercedes-Maybach_S_600_Pullman_Genf_2018.jpg"
-        if "g800" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Brabus_800_Widestar.jpg/1200px-Brabus_800_Widestar.jpg"
-        if "m4" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/BMW_G82_IAA_2021_1X7A0064.jpg/1200px-BMW_G82_IAA_2021_1X7A0064.jpg"
-        if "i8" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/BMW_i8_Roadster_IMG_1523.jpg/1200px-BMW_i8_Roadster_IMG_1523.jpg"
-        if "rs 6" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Audi_RS6_Avant_C8_IAA_2019_JM_0485.jpg/1200px-Audi_RS6_Avant_C8_IAA_2019_JM_0485.jpg"
-        if "navigator" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/2018_Lincoln_Navigator_Reserve_AWD_front_4.16.18.jpg/1200px-2018_Lincoln_Navigator_Reserve_AWD_front_4.16.18.jpg"
-        if "range rover" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Land_Rover_Range_Rover_L460_Autobiography_IAA_2023_1X7A0388.jpg/1200px-Land_Rover_Range_Rover_L460_Autobiography_IAA_2023_1X7A0388.jpg"
-        if "cullinan" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg/1200px-Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg"
-        if "phantom" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Rolls-Royce_Phantom_VIII_IMG_4473.jpg/1200px-Rolls-Royce_Phantom_VIII_IMG_4473.jpg"
-        if "revuelto" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Lamborghini_Revuelto_1X7A6673.jpg/1200px-Lamborghini_Revuelto_1X7A6673.jpg"
-        if "sf90" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg/1200px-Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg"
-        if "chiron" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg/1200px-Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg"
+        if "sl 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg/800px-Mercedes-AMG_SL_63_4MATIC%2B_R232_IMG_6090.jpg"
+        if "g 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg/800px-Mercedes-AMG_G_63_%28W463_second_generation%29_IMG_4187.jpg"
+        if "gt 63" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Mercedes-AMG_GT_63_S_E_Performance_IAA_2021_1X7A0168.jpg/800px-Mercedes-AMG_GT_63_S_E_Performance_IAA_2021_1X7A0168.jpg"
+        if "s 680" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg/800px-Mercedes-Maybach_S_680_%28Z223%29_IAA_2021_1X7A0222.jpg"
+        if "pullman" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Mercedes-Maybach_S_600_Pullman_Genf_2018.jpg/800px-Mercedes-Maybach_S_600_Pullman_Genf_2018.jpg"
+        if "g800" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Brabus_800_Widestar.jpg/800px-Brabus_800_Widestar.jpg"
+        if "m4" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/BMW_G82_IAA_2021_1X7A0064.jpg/800px-BMW_G82_IAA_2021_1X7A0064.jpg"
+        if "i8" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/BMW_i8_Roadster_IMG_1523.jpg/800px-BMW_i8_Roadster_IMG_1523.jpg"
+        if "rs 6" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Audi_RS6_Avant_C8_IAA_2019_JM_0485.jpg/800px-Audi_RS6_Avant_C8_IAA_2019_JM_0485.jpg"
+        if "navigator" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/2018_Lincoln_Navigator_Reserve_AWD_front_4.16.18.jpg/800px-2018_Lincoln_Navigator_Reserve_AWD_front_4.16.18.jpg"
+        if "range rover" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Land_Rover_Range_Rover_L460_Autobiography_IAA_2023_1X7A0388.jpg/800px-Land_Rover_Range_Rover_L460_Autobiography_IAA_2023_1X7A0388.jpg"
+        if "cullinan" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg/800px-Rolls-Royce_Cullinan_at_IAA_2019_IMG_0372.jpg"
+        if "phantom" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Rolls-Royce_Phantom_VIII_IMG_4473.jpg/800px-Rolls-Royce_Phantom_VIII_IMG_4473.jpg"
+        if "revuelto" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Lamborghini_Revuelto_1X7A6673.jpg/800px-Lamborghini_Revuelto_1X7A6673.jpg"
+        if "sf90" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg/800px-Ferrari_SF90_Stradale_front_2019_Plastiglas.jpg"
+        if "chiron" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg/800px-Bugatti_Chiron_Super_Sport_300%2B_IMG_4682.jpg"
         
         # 默认车图
-        return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg/1200px-Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg"
+        return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg/800px-Bentley_Continental_GT_Speed_%282021%29_IMG_4379.jpg"
 
     # --- ✈️ 舰队精准图 ---
     if cat == "Fleet":
         if "yacht" in name:
-            if "azzam" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Azzam_2012.jpg/1200px-Azzam_2012.jpg"
-            if "dilbar" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Dilbar_Antibes_02_06_2016.jpg/1200px-Dilbar_Antibes_02_06_2016.jpg"
-            if "eclipse" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Yacht_Eclipse_Antibes.jpg/1200px-Yacht_Eclipse_Antibes.jpg"
-            return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/L%C3%BCrssen_Nord.jpg/1200px-L%C3%BCrssen_Nord.jpg"
+            if "azzam" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Azzam_2012.jpg/800px-Azzam_2012.jpg"
+            if "dilbar" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Dilbar_Antibes_02_06_2016.jpg/800px-Dilbar_Antibes_02_06_2016.jpg"
+            if "eclipse" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Yacht_Eclipse_Antibes.jpg/800px-Yacht_Eclipse_Antibes.jpg"
+            return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/L%C3%BCrssen_Nord.jpg/800px-L%C3%BCrssen_Nord.jpg"
             
         if "gulfstream" in name: 
-            if "g700" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Gulfstream_G700_N702GD_at_EBACE_2022.jpg/1200px-Gulfstream_G700_N702GD_at_EBACE_2022.jpg"
-            return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Gulfstream_G700_%28N702GD%29_in_flight.jpg/1200px-Gulfstream_G700_%28N702GD%29_in_flight.jpg"
+            if "g700" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Gulfstream_G700_N702GD_at_EBACE_2022.jpg/800px-Gulfstream_G700_N702GD_at_EBACE_2022.jpg"
+            return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Gulfstream_G700_%28N702GD%29_in_flight.jpg/800px-Gulfstream_G700_%28N702GD%29_in_flight.jpg"
             
-        if "global" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg/1200px-Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg"
-        if "falcon" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Dassault_Falcon_8X_F-WWQA_PAS_2015_02.jpg/1200px-Dassault_Falcon_8X_F-WWQA_PAS_2015_02.jpg"
-        if "bbj" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Boeing_Business_Jet_737-700_BBJ%2C_Private_JP7397145.jpg/1200px-Boeing_Business_Jet_737-700_BBJ%2C_Private_JP7397145.jpg"
+        if "global" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg/800px-Bombardier_Global_7500_N750GX_at_EBACE_2019.jpg"
+        if "falcon" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Dassault_Falcon_8X_F-WWQA_PAS_2015_02.jpg/800px-Dassault_Falcon_8X_F-WWQA_PAS_2015_02.jpg"
+        if "bbj" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Boeing_Business_Jet_737-700_BBJ%2C_Private_JP7397145.jpg/800px-Boeing_Business_Jet_737-700_BBJ%2C_Private_JP7397145.jpg"
         
         # 默认飞机
-        return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Cessna_Citation_Longitude_%28N702CL%29_at_EBACE_2019.jpg/1200px-Cessna_Citation_Longitude_%28N702CL%29_at_EBACE_2019.jpg"
+        return "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Cessna_Citation_Longitude_%28N702CL%29_at_EBACE_2019.jpg/800px-Cessna_Citation_Longitude_%28N702CL%29_at_EBACE_2019.jpg"
 
     # --- 🏰 地产精准图 ---
     if cat == "Estate":
         if "101" in name or "park" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Central_Park_Tower_%2852233633214%29.jpg/800px-Central_Park_Tower_%2852233633214%29.jpg"
-        if "courtyard" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Siheyuan_Beijing.jpg/1200px-Siheyuan_Beijing.jpg"
-        if "the one" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/The_Manor_at_Holmby_Hills.jpg/1200px-The_Manor_at_Holmby_Hills.jpg"
-        if "hyde" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/One_Hyde_Park_Knightsbridge.jpg/1200px-One_Hyde_Park_Knightsbridge.jpg"
+        if "courtyard" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Siheyuan_Beijing.jpg/800px-Siheyuan_Beijing.jpg"
+        if "the one" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/The_Manor_at_Holmby_Hills.jpg/800px-The_Manor_at_Holmby_Hills.jpg"
+        if "hyde" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/One_Hyde_Park_Knightsbridge.jpg/800px-One_Hyde_Park_Knightsbridge.jpg"
         if "odéon" in name: return "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Tour_Od%C3%A9on_from_Jardin_Exotique.jpg/800px-Tour_Od%C3%A9on_from_Jardin_Exotique.jpg"
-        
-        # 默认豪宅
-        return "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Chateau_de_Vaux_le_Vicomte.jpg/1200px-Chateau_de_Vaux_le_Vicomte.jpg"
+        return "https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Chateau_de_Vaux_le_Vicomte.jpg/800px-Chateau_de_Vaux_le_Vicomte.jpg"
 
-    return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Hermes_Birkin_Himalaya.jpg/1200px-Hermes_Birkin_Himalaya.jpg"
+    return "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Hermes_Birkin_Himalaya.jpg/800px-Hermes_Birkin_Himalaya.jpg"
 
 # ==========================================
 # 2. 深度选配矩阵 (无错版)
