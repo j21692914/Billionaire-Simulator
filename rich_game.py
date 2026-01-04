@@ -2,12 +2,11 @@ import streamlit as st
 import streamlit.components.v1 as components
 import json
 import random
-import time
 
 # ==========================================
-# 0. 页面配置
+# 0. 页面配置 (全屏黑金)
 # ==========================================
-st.set_page_config(page_title="JARVIS GLOBAL COMMAND", layout="wide", page_icon="⚛️")
+st.set_page_config(page_title="GOD MODE COMMANDER", layout="wide", page_icon="☢️")
 
 st.markdown("""
 <style>
@@ -17,75 +16,78 @@ st.markdown("""
     
     /* 资产卡片 */
     .asset-card {
-        background: rgba(0, 10, 20, 0.9);
+        background: rgba(0, 15, 30, 0.9);
         border: 1px solid #0044ff;
-        border-left: 3px solid #00aaff;
-        border-radius: 2px;
-        padding: 12px;
-        margin-bottom: 8px;
-        transition: all 0.3s;
+        border-left: 4px solid #00aaff;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 10px;
+        transition: all 0.2s;
     }
     .asset-card:hover {
-        background: rgba(0, 30, 50, 1);
-        transform: translateX(10px);
-        box-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
+        background: rgba(0, 40, 60, 1);
+        box-shadow: 0 0 20px rgba(0, 170, 255, 0.5);
+        transform: scale(1.02);
     }
     
     /* 字体 */
-    h1, h2, h3 {color: #00aaff !important; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 8px #00aaff;}
-    .price {color: #00ffcc; font-family: 'Courier New'; font-weight: bold;}
+    h1, h2, h3 {color: #00aaff !important; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 10px #00aaff;}
+    .price {color: #ffcc00; font-family: 'Courier New'; font-weight: bold; font-size: 1.1em;}
     
     /* 红色发射按钮 */
-    .launch-btn {
-        border: 1px solid #ff3300 !important;
-        color: #ff3300 !important;
-        background: rgba(255, 50, 0, 0.1) !important;
+    div.stButton > button {
+        border: 1px solid #00aaff; color: #00aaff; background: transparent;
+        width: 100%; padding: 10px; border-radius: 0;
     }
-    .launch-btn:hover {
-        background: #ff3300 !important;
-        color: #000 !important;
-        box-shadow: 0 0 20px #ff3300;
+    div.stButton > button:hover {
+        background: #00aaff; color: #000;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. 资产数据库 (含军事)
+# 1. 资产数据库 (含顶级军事装备)
 # ==========================================
 def create_db():
     return {
-        "⚔️ MILITARY (Classified)": [
-            ("Lockheed Martin", "F-22 Raptor Squad", 350000000),
-            ("Northrop", "B-2 Spirit Stealth", 2100000000),
-            ("General Dynamics", "F-16 Fighting Falcon", 60000000),
-            ("Navy", "Nimitz Class Carrier", 8500000000),
-            ("Navy", "Virginia Class Sub", 2800000000),
-            ("Army", "M1A2 Abrams Batallion", 90000000),
-            ("Raytheon", "Patriot Missile Battery", 1000000000)
+        "⚔️ MILITARY (TOP SECRET)": [
+            ("USAF", "F-22 Raptor Squadron", 350000000),
+            ("Northrop", "B-2 Spirit Stealth Bomber", 2100000000),
+            ("Lockheed", "SR-72 Darkstar (Hypersonic)", 5000000000),
+            ("Navy", "Gerald R. Ford Carrier", 13000000000),
+            ("Navy", "Columbia Class Nuke Sub", 8500000000),
+            ("SpaceX", "Starship Military Cargo", 150000000),
+            ("Raytheon", "Iron Dome Battery", 100000000)
         ],
-        "🏎️ LAND ASSETS": [
-            ("Mercedes-AMG", "G 63 6x6", 650000), ("Rolls-Royce", "Phantom VIII Armor", 1200000),
-            ("Bugatti", "Centodieci", 9000000), ("Tesla", "Cybertruck Foundation", 120000)
+        "🏎️ LAND COLLECTION": [
+            ("Mercedes-AMG", "G 63 6x6 Armored", 1200000),
+            ("Rolls-Royce", "Phantom VIII Bulletproof", 2500000),
+            ("Bugatti", "La Voiture Noire", 18000000),
+            ("Tesla", "Cybertruck Beast Foundation", 120000)
         ],
-        "✈️ AIR ASSETS": [
-            ("Gulfstream", "G700 Executive", 78000000), ("Boeing", "BBJ 747-8i", 420000000),
-            ("Sikorsky", "S-76D Helicopter", 15000000)
+        "✈️ AIR FLEET": [
+            ("Gulfstream", "G700 World Tourer", 78000000),
+            ("Boeing", "BBJ 747-8i Palace", 450000000),
+            ("Sikorsky", "S-92 VIP Helo", 25000000)
         ],
-        "⚓ NAVAL ASSETS": [
-            ("Lürssen", "Project Blue", 600000000), ("Oceanco", "Black Pearl", 220000000)
+        "⚓ MEGA YACHTS": [
+            ("Lürssen", "Project Azzam (180m)", 650000000),
+            ("Oceanco", "Y721 Koru (Sailing)", 550000000)
         ]
     }
 
 DB = create_db()
 
 # ==========================================
-# 2. 状态管理
+# 2. 状态管理 (1万亿资金 + 发射状态)
 # ==========================================
 if 'cash' not in st.session_state:
-    st.session_state.cash = 50000000000
-    st.session_state.inventory = []
-if 'launch_trigger' not in st.session_state:
-    st.session_state.launch_trigger = False
+    st.session_state.cash = 1000000000000 # 1万亿美元
+    st.session_state.inventory = [] # 资产库
+    
+    # 预设几个资产让地图不空
+    st.session_state.inventory.append({"brand":"USAF", "name":"F-22 Raptor [PATROL]", "price":0, "lat":35, "lng":-118})
+    st.session_state.inventory.append({"brand":"Navy", "name":"Ford Carrier [DEPLOYED]", "price":0, "lat":20, "lng":-160})
 
 # 购买逻辑
 def buy(brand, name, price):
@@ -95,44 +97,46 @@ def buy(brand, name, price):
             "brand": brand, "name": name, "price": price,
             "lat": random.uniform(-60, 60), "lng": random.uniform(-180, 180)
         })
-        st.toast(f"✅ UNIT ACQUIRED: {name}")
+        st.toast(f"✅ UNIT DEPLOYED: {name}")
         st.rerun()
 
-# 发射逻辑
+# 发射状态处理 (利用 Session State 传递给前端)
+if 'launch_mode' not in st.session_state:
+    st.session_state.launch_mode = False
+
 def trigger_launch():
-    st.session_state.launch_trigger = True
-    st.rerun()
+    st.session_state.launch_mode = True
+    # 不重新运行，直接利用下面的渲染逻辑
 
 # ==========================================
-# 3. 全息引擎 (Transparent Marvel Style)
+# 3. 全息引擎 V3.0 (增强动画版)
 # ==========================================
-assets_data = json.dumps(st.session_state.inventory)
-launch_status = "true" if st.session_state.launch_trigger else "false"
+assets_json = json.dumps(st.session_state.inventory)
+launch_flag = "true" if st.session_state.launch_mode else "false"
 
-# 发射后重置状态，防止刷新页面重复发射
-if st.session_state.launch_trigger:
-    st.session_state.launch_trigger = False
+# 渲染完成后重置发射状态，防止无限发射
+if st.session_state.launch_mode:
+    st.session_state.launch_mode = False 
 
 html_code = f"""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <style>
-        body {{ margin: 0; background: #000; overflow: hidden; }}
+        body {{ margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', sans-serif; }}
         
-        /* 倒计时覆盖层 */
-        #countdown-layer {{
+        /* 倒计时层 */
+        #launch-overlay {{
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
-            pointer-events: none; z-index: 100;
-            display: none;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(20, 0, 0, 0.4);
+            z-index: 999; pointer-events: none; opacity: 0; transition: opacity 0.5s;
         }}
-        #countdown-text {{
-            font-family: 'Courier New', monospace;
-            font-size: 10vw; color: #ff3300; font-weight: bold;
-            text-shadow: 0 0 30px #ff3300;
-            animation: pulse 0.8s infinite;
+        .countdown-num {{
+            font-size: 15vw; font-weight: 900; color: #ff0000;
+            text-shadow: 0 0 50px #ff0000; animation: pulse 1s infinite;
         }}
+        .launch-status {{ font-size: 2vw; color: #ff5555; letter-spacing: 5px; margin-top: 20px; }}
         
         @keyframes pulse {{
             0% {{ transform: scale(1); opacity: 1; }}
@@ -142,197 +146,205 @@ html_code = f"""
 
         /* HUD */
         #hud {{
-            position: absolute; top: 20px; left: 20px; z-index: 50;
-            font-family: 'Segoe UI', sans-serif; color: #00aaff;
-            pointer-events: none;
+            position: absolute; top: 20px; left: 20px; pointer-events: none; z-index: 100;
         }}
-        .hud-line {{ border-left: 2px solid #00aaff; padding-left: 10px; margin-bottom: 5px; }}
+        .hud-title {{ color: #00aaff; font-size: 24px; font-weight: bold; letter-spacing: 3px; text-shadow: 0 0 10px #00aaff; }}
+        .hud-info {{ color: #0088cc; font-size: 12px; margin-top: 5px; }}
         
+        /* 资产标签 */
+        .label {{
+            background: rgba(0, 20, 40, 0.8); border: 1px solid #00aaff;
+            color: #fff; padding: 4px 8px; font-size: 10px; border-radius: 2px;
+            pointer-events: none; box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+        }}
     </style>
     <script src="https://unpkg.com/three"></script>
     <script src="https://unpkg.com/globe.gl"></script>
 </head>
 <body>
-    <div id="countdown-layer"><div id="countdown-text">10</div></div>
-    
+    <div id="launch-overlay">
+        <div id="countdown-text" class="countdown-num">10</div>
+        <div class="launch-status">ICBM LAUNCH SEQUENCE INITIATED</div>
+    </div>
+
     <div id="hud">
-        <h1 style="margin:0; text-shadow:0 0 15px #00aaff;">STARK WORLD SYSTEM</h1>
-        <div class="hud-line">ORBITAL DEFENSE: ONLINE</div>
-        <div class="hud-line">GLOBAL ASSETS: {len(st.session_state.inventory)}</div>
-        <div class="hud-line" id="status-msg">STATUS: MONITORING</div>
+        <div class="hud-title">GOD MODE // COMMANDER</div>
+        <div class="hud-info">ORBITAL SATELLITES: ACTIVE (20)</div>
+        <div class="hud-info">GLOBAL ASSETS: {len(st.session_state.inventory)} UNITS</div>
     </div>
     
     <div id="globeViz"></div>
 
     <script>
-        // 1. 数据准备
-        const assets = {assets_data};
-        const shouldLaunch = {launch_status};
-        
-        // 生成大量卫星 (红/蓝发光点)
-        const satellites = [...Array(20).keys()].map(() => ({{
+        // 1. 接收 Python 数据
+        const myAssets = {assets_json};
+        const startLaunch = {launch_flag};
+
+        // 2. 生成卫星群数据 (确保能看见)
+        const N_SATS = 25;
+        const satellites = [...Array(N_SATS).keys()].map(() => ({{
             lat: (Math.random() - 0.5) * 160,
             lng: (Math.random() - 0.5) * 360,
-            alt: 0.3 + Math.random() * 0.4,
-            radius: 1.5,
-            color: Math.random() > 0.5 ? '#ff3300' : '#00aaff',
-            speed: (Math.random() * 0.5 + 0.2) * (Math.random()>0.5?1:-1)
+            alt: 0.4 + Math.random() * 0.5,
+            radius: 1.0, // 增大尺寸
+            color: Math.random() > 0.5 ? '#ff0000' : '#00ffff', // 红/青色
+            speed: (Math.random() * 0.3 + 0.1) * (Math.random()>0.5?1:-1)
         }}));
 
-        // 2. 初始化地球 (透明全息风)
+        // 3. 初始化地球
         const world = Globe()
             (document.getElementById('globeViz'))
             .backgroundColor('#000000')
-            // 使用夜景图作为基础，但会调整材质使其透明
+            
+            // --- 全息地球材质 (半透明蓝) ---
             .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
             .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-            .atmosphereColor('#0088ff')
-            .atmosphereAltitude(0.3)
+            .atmosphereColor('#0066ff')
+            .atmosphereAltitude(0.25)
             
-            // --- 卫星 (自定义发光球体) ---
+            // --- 卫星 (发光球体) ---
             .customLayerData(satellites)
             .customThreeObject(d => {{
                 const mesh = new THREE.Mesh(
                     new THREE.SphereGeometry(d.radius, 8, 8),
                     new THREE.MeshBasicMaterial({{ color: d.color }})
                 );
-                // 添加发光光晕
+                // 加光晕
                 const glow = new THREE.Mesh(
                     new THREE.SphereGeometry(d.radius * 3, 8, 8),
-                    new THREE.MeshBasicMaterial({{ color: d.color, transparent: true, opacity: 0.3 }})
+                    new THREE.MeshBasicMaterial({{ color: d.color, transparent: true, opacity: 0.4 }})
                 );
                 mesh.add(glow);
                 return mesh;
             }})
             .customThreeObjectUpdate((obj, d) => {{
-                // 卫星运动逻辑
+                // 卫星飞行逻辑 (每帧更新经度)
                 Object.assign(obj.position, world.getCoords(d.lat, d.lng += d.speed, d.alt));
             }})
 
-            // --- 资产点 (改为蓝色全息波纹，去掉了黄色柱子) ---
-            .ringsData(assets)
-            .ringColor(() => t => `rgba(0, 170, 255, ${{1-t}})`)
-            .ringMaxRadius(5)
-            .ringPropagationSpeed(2)
-            .ringRepeatPeriod(2000);
+            // --- 资产展示 (HTML标签 + 蓝色光柱) ---
+            .htmlElementsData(myAssets)
+            .htmlLat('lat').htmlLng('lng')
+            .htmlElement(d => {{
+                const el = document.createElement('div');
+                el.className = 'label';
+                el.innerHTML = `<div>${{d.name}}</div>`;
+                return el;
+            }})
+            
+            // --- 资产光柱 (替代原来的HTML点，更有科技感) ---
+            .pointsData(myAssets)
+            .pointLat('lat').pointLng('lng')
+            .pointColor(() => '#00aaff')
+            .pointAltitude(0.1)
+            .pointRadius(0.5);
 
-        // 3. 材质黑客：让地球变透明 (Marvel Style)
-        // 等待材质加载完成后修改
+        // 4. 材质黑客：让地球变透明 (Holo Effect)
         setTimeout(() => {{
-            const globeObj = world.scene().children.find(obj => obj.type === 'Group');
-            if(globeObj) {{
-                globeObj.traverse(child => {{
-                    if (child.isMesh && child.material.name === 'globe-material') {{
-                        child.material.transparent = true;
-                        child.material.opacity = 0.85; // 半透明
-                        child.material.color.setHex(0x4444ff); // 偏蓝色调
-                        child.material.emissive.setHex(0x001133); // 自发光微蓝
-                    }}
-                }});
-            }}
-        }}, 1000);
+            const scene = world.scene();
+            scene.traverse(obj => {{
+                if (obj.type === 'Mesh' && obj.material.name === 'globe-material') {{
+                    obj.material.transparent = true;
+                    obj.material.opacity = 0.85; 
+                    obj.material.color.setHex(0x2244ff); // 强蓝色叠加
+                }}
+            }});
+        }}, 500);
 
-        // 4. 场景特效 (星空 & 自转)
+        // 5. 动画循环 (星空 + 自转)
         const scene = world.scene();
-        
-        // 增加星空
         const starGeo = new THREE.BufferGeometry();
-        const starMat = new THREE.PointsMaterial({{color:0xffffff, size:0.5}});
+        const starMat = new THREE.PointsMaterial({{color:0xffffff, size:0.6}});
         const stars = [];
-        for(let i=0; i<5000; i++) stars.push((Math.random()-0.5)*4000);
+        for(let i=0; i<3000; i++) stars.push((Math.random()-0.5)*4000);
         starGeo.setAttribute('position', new THREE.Float32BufferAttribute(stars, 3));
         scene.add(new THREE.Points(starGeo, starMat));
 
-        // 自动旋转控制器
         world.controls().autoRotate = true;
-        world.controls().autoRotateSpeed = 0.6; // 转速
+        world.controls().autoRotateSpeed = 0.5;
 
-        // 5. 火箭发射系统
-        if (shouldLaunch) {{
-            const countdownEl = document.getElementById('countdown-layer');
-            const numEl = document.getElementById('countdown-text');
-            const statusEl = document.getElementById('status-msg');
-            
-            countdownEl.style.display = 'flex';
-            statusEl.innerText = "STATUS: LAUNCH SEQUENCE INITIATED";
-            statusEl.style.color = "#ff3300";
+        // 火箭对象 (全局变量)
+        let rocketMesh = null;
+        let rocketAlt = 0;
+
+        // 6. 发射逻辑
+        if (startLaunch) {{
+            const overlay = document.getElementById('launch-overlay');
+            const txt = document.getElementById('countdown-text');
+            overlay.style.opacity = 1;
             
             let count = 10;
             const timer = setInterval(() => {{
                 count--;
-                numEl.innerText = count;
-                
-                if(count <= 0) {{
+                txt.innerText = count;
+                if (count <= 0) {{
                     clearInterval(timer);
-                    countdownEl.style.display = 'none';
-                    launchRocket();
-                    statusEl.innerText = "STATUS: ROCKET IN TRAJECTORY";
+                    overlay.style.opacity = 0;
+                    fireRocket();
                 }}
             }}, 1000);
         }}
 
-        function launchRocket() {{
-            // 创建火箭对象
-            const rocketGeo = new THREE.ConeGeometry(0.5, 2, 8);
-            const rocketMat = new THREE.MeshBasicMaterial({{ color: 0xff3300 }});
-            const rocket = new THREE.Mesh(rocketGeo, rocketMat);
+        function fireRocket() {{
+            // 创建火箭
+            const geo = new THREE.ConeGeometry(0.5, 2, 8);
+            const mat = new THREE.MeshBasicMaterial({{color: 0xff3300}});
+            rocketMesh = new THREE.Mesh(geo, mat);
             
-            // 尾焰
-            const trailGeo = new THREE.ConeGeometry(0.8, 5, 8);
-            const trailMat = new THREE.MeshBasicMaterial({{ color: 0xffaa00, transparent: true, opacity: 0.6 }});
-            const trail = new THREE.Mesh(trailGeo, trailMat);
+            // 尾焰粒子
+            const trail = new THREE.Mesh(
+                new THREE.ConeGeometry(0.8, 6, 8),
+                new THREE.MeshBasicMaterial({{color: 0xffaa00, transparent:true, opacity:0.6}})
+            );
             trail.position.y = -3;
             trail.rotation.x = Math.PI;
-            rocket.add(trail);
-
-            scene.add(rocket);
-
-            // 发射动画参数
-            let altitude = 1.1; // 初始高度 (地表)
-            const launchLat = 28.5; // 卡纳维拉尔角附近
-            const launchLng = -80.6;
+            rocketMesh.add(trail);
             
-            function animateRocket() {{
-                altitude += 0.05; // 上升速度
-                const coords = world.getCoords(launchLat, launchLng, altitude);
-                rocket.position.set(coords.x, coords.y, coords.z);
-                
-                // 让火箭头朝外
-                rocket.lookAt(new THREE.Vector3(0,0,0));
-                rocket.rotateX(Math.PI); // 修正朝向
-
-                if(altitude < 10) {{ // 飞到一定高度停止或消失
-                    requestAnimationFrame(animateRocket);
-                }} else {{
-                    scene.remove(rocket);
-                }}
-            }}
-            animateRocket();
+            scene.add(rocketMesh);
+            rocketAlt = 0.1; // 初始高度
         }}
 
-        // 强制刷新渲染循环
+        // 7. 渲染帧循环
         (function tick() {{
-            // 确保自转持续
-            world.controls().update();
+            world.controls().update(); // 维持自转
+            
+            // 更新卫星位置
+            world.customLayerData(world.customLayerData()); 
+
+            // 火箭升空动画
+            if (rocketMesh) {{
+                rocketAlt += 0.05;
+                const coords = world.getCoords(28.5, -80.6, rocketAlt); // 卡纳维拉尔角
+                rocketMesh.position.set(coords.x, coords.y, coords.z);
+                rocketMesh.lookAt(new THREE.Vector3(0,0,0)); // 尾部对准地心
+                rocketMesh.rotateX(Math.PI); // 修正头部朝外
+                
+                if (rocketAlt > 15) {{ // 飞出视野销毁
+                    scene.remove(rocketMesh);
+                    rocketMesh = null;
+                }}
+            }}
+
             requestAnimationFrame(tick);
         }})();
-
+        
+        world.pointOfView({{ altitude: 2.5 }}); // 拉远视角
     </script>
 </body>
 </html>
 """
 
 # ==========================================
-# 4. 界面布局
+# 4. 界面布局 (控制台)
 # ==========================================
-# 顶部全息屏
+# 渲染全息地球
 components.html(html_code, height=600, scrolling=False)
 
-# 控制台区域
-c1, c2 = st.columns([3, 1])
+# 控制面板
+c1, c2 = st.columns([2, 1])
 
 with c1:
-    st.markdown("### 🛒 MILITARY & ASSET PROCUREMENT")
+    st.markdown("### 🛒 ASSET PROCUREMENT (CLASS 5 CLEARANCE)")
     tabs = st.tabs(list(DB.keys()))
     
     for i, (cat, items) in enumerate(DB.items()):
@@ -342,8 +354,8 @@ with c1:
                 with col_a:
                     st.markdown(f"""
                     <div class="asset-card">
-                        <div style="color:#00aaff; font-size:0.8em;">{brand}</div>
-                        <div style="font-size:1.2em; font-weight:bold; color:#fff;">{name}</div>
+                        <div style="color:#0088aa; font-size:0.8em;">{brand}</div>
+                        <div style="font-size:1.1em; font-weight:bold; color:#fff;">{name}</div>
                         <div class="price">${price:,}</div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -353,25 +365,24 @@ with c1:
                         buy(brand, name, price)
 
 with c2:
-    st.markdown("### 🛑 DANGER ZONE")
-    # 火箭发射按钮 (特殊样式)
-    if st.button("🚀 INITIATE LAUNCH", key="btn_launch", help="Start 10s Countdown"):
-        trigger_launch()
-    
-    st.markdown("---")
-    st.markdown("### 💰 TREASURY")
     st.markdown(f"""
-    <div style="border:1px solid #00ffcc; padding:20px; text-align:center; border-radius:4px;">
-        <div style="color:#888;">LIQUID FUNDS</div>
-        <div style="font-size:2em; color:#00ffcc; font-family:'Courier New';">
+    <div style="border:1px solid #ffcc00; padding:20px; text-align:center; background:#111; margin-bottom:20px;">
+        <div style="color:#888;">TREASURY BALANCE</div>
+        <div style="font-size:2.5em; color:#ffcc00; font-family:'Courier New'; font-weight:bold;">
             ${st.session_state.cash:,.0f}
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### 📋 ACTIVE UNITS")
+    # 红色发射按钮
+    st.markdown("### 🚀 STRATEGIC LAUNCH")
+    if st.button("INITIATE ICBM LAUNCH (10s TIMER)", type="primary"):
+        trigger_launch()
+        
+    st.markdown("---")
+    st.markdown("### 📋 ACTIVE DEPLOYMENTS")
     if not st.session_state.inventory:
-        st.info("NO ACTIVE ASSETS")
+        st.info("NO ACTIVE UNITS")
     else:
-        for item in reversed(st.session_state.inventory[-5:]): # 只显示最近5个
-            st.code(f"{item['name']}\nCOORD: {item['lat']:.2f}, {item['lng']:.2f}")
+        for i, item in enumerate(reversed(st.session_state.inventory[-6:])):
+            st.code(f"[{item['brand']}] {item['name']}")
