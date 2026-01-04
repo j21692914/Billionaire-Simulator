@@ -6,37 +6,26 @@ import random
 # ==========================================
 # 0. 页面配置 (全屏黑金)
 # ==========================================
-st.set_page_config(page_title="HOLO-COMMANDER V5", layout="wide", page_icon="⚛️")
+st.set_page_config(page_title="JARVIS V6", layout="wide", page_icon="💠")
 
 st.markdown("""
 <style>
-    .stApp {background-color: #000000; color: #00aaff; font-family: 'Segoe UI', monospace;}
-    [data-testid="stSidebar"] {background-color: #050505; border-right: 1px solid #003333;}
+    .stApp {background-color: #000000; color: #00ccff; font-family: 'Segoe UI', monospace;}
+    [data-testid="stSidebar"] {background-color: #080808; border-right: 1px solid #003333;}
     header, footer {visibility: hidden;}
     
     /* 资产卡片 */
     .asset-card {
-        background: rgba(0, 15, 30, 0.9);
+        background: rgba(0, 20, 30, 0.9);
         border: 1px solid #0044ff;
-        border-left: 4px solid #00aaff;
-        border-radius: 4px;
-        padding: 10px;
-        margin-bottom: 8px;
-        transition: all 0.2s;
+        border-left: 3px solid #00ccff;
+        padding: 10px; margin-bottom: 8px;
     }
-    .asset-card:hover {
-        background: rgba(0, 50, 80, 1);
-        transform: translateX(5px);
-        border-color: #fff;
-    }
+    h1, h2, h3 {color: #00ccff !important; text-shadow: 0 0 10px #00ccff;}
     
-    /* 字体 */
-    h1, h2, h3 {color: #00aaff !important; letter-spacing: 2px; text-shadow: 0 0 10px #00aaff;}
-    .price {color: #ffcc00; font-family: 'Courier New'; font-weight: bold;}
-    
-    /* 发射按钮 */
+    /* 红色发射按钮 */
     div.stButton > button {
-        border: 1px solid #ff3300; color: #ff3300; background: rgba(50,0,0,0.5);
+        border: 1px solid #ff3300; color: #ff3300; background: rgba(50,0,0,0.3);
         width: 100%; font-weight: bold; letter-spacing: 2px;
     }
     div.stButton > button:hover {
@@ -46,48 +35,39 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. 资产数据库 (全量 60+)
+# 1. 资产数据库 (全量)
 # ==========================================
 def create_db():
     return {
-        "⚔️ MILITARY (TOP SECRET)": [
+        "⚔️ MILITARY": [
             ("USAF", "F-22 Raptor", 350000000), ("Northrop", "B-2 Spirit", 2100000000),
-            ("Lockheed", "SR-71 Blackbird", 0), ("Navy", "USS Gerald Ford", 13000000000),
-            ("Navy", "Nuclear Submarine", 8500000000), ("SpaceX", "Starship Mil-Spec", 150000000),
-            ("Raytheon", "Patriot Missile", 1000000000)
+            ("Navy", "USS Gerald Ford", 13000000000), ("Navy", "Nuclear Sub", 8500000000),
+            ("SpaceX", "Starship Military", 150000000), ("Raytheon", "Patriot", 1000000000)
         ],
-        "🏎️ SUPERCARS": [
+        "🏎️ CARS": [
             ("Rolls-Royce", "Phantom VIII", 650000), ("Rolls-Royce", "Cullinan", 480000),
-            ("Rolls-Royce", "Boat Tail", 28000000), ("Bugatti", "Chiron SS", 3900000),
-            ("Bugatti", "La Voiture Noire", 18000000), ("Bugatti", "Mistral", 5000000),
-            ("Ferrari", "Daytona SP3", 2200000), ("Ferrari", "LaFerrari", 4500000),
-            ("Ferrari", "SF90 Spider", 550000), ("Lamborghini", "Revuelto", 600000),
-            ("Lamborghini", "Countach LPI", 2600000), ("Mercedes-AMG", "G 63 6x6", 1200000),
-            ("Aston Martin", "Valkyrie", 3500000), ("Pagani", "Utopia", 2500000),
-            ("Koenigsegg", "Jesko", 3400000)
+            ("Bugatti", "Chiron SS", 3900000), ("Bugatti", "La Voiture Noire", 18000000),
+            ("Ferrari", "LaFerrari", 4500000), ("Lamborghini", "Revuelto", 600000),
+            ("Mercedes", "G 63 6x6", 1200000), ("Koenigsegg", "Jesko", 3400000)
         ],
-        "✈️ PRIVATE JETS": [
+        "✈️ JETS": [
             ("Gulfstream", "G700", 78000000), ("Gulfstream", "G800", 81500000),
-            ("Gulfstream", "G650ER", 70000000), ("Bombardier", "Global 7500", 75000000),
-            ("Boeing", "BBJ 747-8", 450000000), ("Boeing", "BBJ 787", 280000000),
-            ("Dassault", "Falcon 10X", 75000000), ("Sikorsky", "S-92 Helo", 25000000)
+            ("Bombardier", "Global 7500", 75000000), ("Boeing", "BBJ 747-8", 450000000),
+            ("Dassault", "Falcon 10X", 75000000)
         ],
         "⚓ YACHTS": [
-            ("Lürssen", "Azzam (180m)", 650000000), ("Lürssen", "Dilbar", 800000000),
-            ("Blohm+Voss", "Eclipse", 1200000000), ("Oceanco", "Black Pearl", 220000000),
-            ("Feadship", "Project 1010", 300000000)
+            ("Lürssen", "Azzam", 650000000), ("Blohm+Voss", "Eclipse", 1200000000),
+            ("Oceanco", "Black Pearl", 220000000)
         ],
         "🏰 ESTATES": [
             ("NY", "Central Park Tower", 250000000), ("London", "The Holme", 300000000),
-            ("France", "Villa Leopolda", 750000000), ("LA", "The One", 140000000),
-            ("Monaco", "Odeon Tower PH", 380000000), ("Hong Kong", "Barker Rd", 280000000)
+            ("France", "Villa Leopolda", 750000000), ("LA", "The One", 140000000)
         ]
     }
-
 DB = create_db()
 
 # ==========================================
-# 2. 状态管理 (1万亿)
+# 2. 状态管理
 # ==========================================
 if 'cash' not in st.session_state:
     st.session_state.cash = 1000000000000
@@ -105,20 +85,16 @@ def buy(brand, name, price):
             "brand": brand, "name": name, "price": price,
             "lat": random.uniform(-60, 60), "lng": random.uniform(-180, 180)
         })
-        st.toast(f"DEPLOYED: {name}")
 
 def trigger_launch():
     st.session_state.launch_mode = True
 
 # ==========================================
-# 3. 全息引擎 V5.0 (国内CDN加速版)
+# 3. 贾维斯全息引擎 (无贴图·纯代码生成)
 # ==========================================
 assets_json = json.dumps(st.session_state.inventory)
 launch_flag = "true" if st.session_state.launch_mode else "false"
-
-# 重置发射状态
-if st.session_state.launch_mode:
-    st.session_state.launch_mode = False 
+if st.session_state.launch_mode: st.session_state.launch_mode = False 
 
 html_code = f"""
 <!DOCTYPE html>
@@ -126,201 +102,189 @@ html_code = f"""
 <head>
     <style>
         body {{ margin: 0; background: #000; overflow: hidden; }}
+        #loader {{ position: absolute; top: 50%; left: 50%; color: #00ccff; transform: translate(-50%,-50%); font-family: sans-serif; }}
         
         /* 倒计时 */
         #overlay {{
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.7); z-index: 999; 
+            background: rgba(0,0,0,0.8); z-index: 999; 
             opacity: 0; transition: opacity 0.5s; pointer-events: none;
         }}
-        .count {{
-            font-family: 'Courier New'; font-size: 20vw; color: #ff0000;
-            font-weight: 900; text-shadow: 0 0 40px #ff0000;
-        }}
+        .count {{ font-family: 'Courier New'; font-size: 20vw; color: #ff0000; font-weight: 900; text-shadow: 0 0 50px #ff0000; }}
         
-        /* HUD */
-        #hud {{ position: absolute; top: 20px; left: 20px; z-index: 100; font-family: sans-serif; pointer-events: none; }}
-        .title {{ color: #00aaff; font-size: 24px; font-weight: bold; letter-spacing: 2px; }}
-        .sub {{ color: #006699; font-size: 12px; }}
-
-        /* 标签 */
-        .label {{
-            background: rgba(0, 0, 0, 0.8); border: 1px solid #00aaff;
-            color: #00aaff; padding: 2px 5px; font-size: 10px;
-            pointer-events: none; box-shadow: 0 0 5px #00aaff;
-        }}
+        #hud {{ position: absolute; top: 20px; left: 20px; z-index: 100; font-family: 'Courier New'; color: #00ccff; pointer-events: none; }}
+        .label {{ background: rgba(0,0,0,0.7); border: 1px solid #00ccff; color: #fff; padding: 2px 5px; font-size: 10px; }}
     </style>
     
-    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.30.0/dist/globe.gl.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.26.4/dist/globe.gl.min.js"></script>
 </head>
 <body>
+    <div id="loader">INITIALIZING JARVIS SYSTEM...</div>
     <div id="overlay"><div id="cnt" class="count">10</div></div>
     
     <div id="hud">
-        <div class="title">HOLO-COMMAND V5</div>
-        <div class="sub">NETWORK: SECURE | SATELLITES: ONLINE</div>
-        <div class="sub">ASSETS: {len(st.session_state.inventory)} UNITS</div>
+        <h2>JARVIS // SYSTEM V6</h2>
+        <div>STATUS: CONNECTED</div>
+        <div>ASSETS: {len(st.session_state.inventory)} UNITS</div>
     </div>
     
     <div id="globeViz"></div>
 
     <script>
+        document.getElementById('loader').style.display = 'none';
         const myAssets = {assets_json};
         const doLaunch = {launch_flag};
 
-        // 1. 生成卫星 (数量增加，尺寸变大)
-        const satellites = [...Array(30).keys()].map(() => ({{
+        // 1. 生成数据
+        // 卫星
+        const satellites = [...Array(40).keys()].map(() => ({{
             lat: (Math.random() - 0.5) * 180,
             lng: (Math.random() - 0.5) * 360,
-            alt: 0.3 + Math.random() * 0.5,
-            radius: 1.5, // 变大
+            alt: 0.3 + Math.random() * 0.6,
+            radius: 0.8,
             color: Math.random() > 0.5 ? '#ff0000' : '#00ffff',
-            speed: (Math.random() * 0.5 + 0.1) * (Math.random()>0.5?1:-1)
+            speed: (Math.random() * 0.5 + 0.2) * (Math.random()>0.5?1:-1)
         }}));
 
-        // 2. 初始化地球
-        const world = Globe()
-            (document.getElementById('globeViz'))
-            .backgroundColor('#000000')
-            .globeImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg') // 同样用CDN
-            .bumpImageUrl('https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png')
-            .atmosphereColor('#0088ff')
-            .atmosphereAltitude(0.2)
-            
-            // 卫星图层
-            .customLayerData(satellites)
-            .customThreeObject(d => {{
-                const mesh = new THREE.Mesh(
-                    new THREE.SphereGeometry(d.radius, 8, 8),
-                    new THREE.MeshBasicMaterial({{ color: d.color }})
-                );
-                // 卫星光晕
-                const glow = new THREE.Mesh(
-                    new THREE.SphereGeometry(d.radius * 3, 8, 8),
-                    new THREE.MeshBasicMaterial({{ color: d.color, transparent: true, opacity: 0.5 }})
-                );
-                mesh.add(glow);
-                return mesh;
-            }})
-            .customThreeObjectUpdate((obj, d) => {{
-                Object.assign(obj.position, world.getCoords(d.lat, d.lng += d.speed, d.alt));
-            }})
-
-            // 资产点 (蓝色脉冲)
-            .pointsData(myAssets)
-            .pointLat('lat').pointLng('lng')
-            .pointColor(() => '#00aaff')
-            .pointAltitude(0.05)
-            .pointRadius(0.8)
-            .pointPulseRipple(true) // 开启脉冲
-            
-            // 资产标签
-            .htmlElementsData(myAssets)
-            .htmlLat('lat').htmlLng('lng')
-            .htmlElement(d => {{
-                const el = document.createElement('div');
-                el.className = 'label';
-                el.innerHTML = d.name;
-                return el;
-            }});
-
-        // 3. 漫威风透明材质
-        setTimeout(() => {{
-            const scene = world.scene();
-            scene.traverse(obj => {{
-                if (obj.type === 'Mesh' && obj.material.name === 'globe-material') {{
-                    obj.material.transparent = true;
-                    obj.material.opacity = 0.8;
-                    obj.material.color.setHex(0x2244ff); // 科技蓝
-                }}
-            }});
-        }}, 1000);
-
-        // 4. 环境配置 (自转 & 星空)
-        const scene = world.scene();
+        // 2. 初始化地球 (纯代码生成，无图模式)
+        // 我们使用 hexBin 来模拟陆地，这样不需要加载任何图片，百分百显示
         
-        // 星空
-        const starGeo = new THREE.BufferGeometry();
-        const starMat = new THREE.PointsMaterial({{color:0xffffff, size:0.5}});
-        const stars = [];
-        for(let i=0; i<3000; i++) stars.push((Math.random()-0.5)*4000);
-        starGeo.setAttribute('position', new THREE.Float32BufferAttribute(stars, 3));
-        scene.add(new THREE.Points(starGeo, starMat));
-
-        // 强制开启自转
-        world.controls().autoRotate = true;
-        world.controls().autoRotateSpeed = 0.8;
-
-        // 5. 火箭发射系统
-        let rocket = null;
-        let rAlt = 0;
-
-        if (doLaunch) {{
-            const ov = document.getElementById('overlay');
-            const cnt = document.getElementById('cnt');
-            ov.style.opacity = 1;
-            
-            let c = 10;
-            const t = setInterval(() => {{
-                c--; cnt.innerText = c;
-                if (c <= 0) {{
-                    clearInterval(t);
-                    ov.style.opacity = 0;
-                    launch();
-                }}
-            }}, 1000);
-        }}
-
-        function launch() {{
-            // 火箭本体
-            const geo = new THREE.ConeGeometry(0.5, 2, 8);
-            const mat = new THREE.MeshBasicMaterial({{color: 0xff0000}});
-            rocket = new THREE.Mesh(geo, mat);
-            
-            // 尾焰
-            const trail = new THREE.Mesh(
-                new THREE.ConeGeometry(0.8, 8, 8),
-                new THREE.MeshBasicMaterial({{color: 0xffaa00, transparent:true, opacity:0.6}})
-            );
-            trail.position.y = -4;
-            trail.rotation.x = Math.PI;
-            rocket.add(trail);
-            
-            scene.add(rocket);
-            rAlt = 0.1;
-        }}
-
-        // 6. 渲染循环
-        (function tick() {{
-            world.controls().update(); // 自转驱动
-            world.customLayerData(world.customLayerData()); // 卫星驱动
-
-            // 火箭飞行
-            if (rocket) {{
-                rAlt += 0.08;
-                const coords = world.getCoords(28.5, -80.6, rAlt); // 佛罗里达发射
-                rocket.position.set(coords.x, coords.y, coords.z);
-                rocket.lookAt(new THREE.Vector3(0,0,0));
-                rocket.rotateX(Math.PI);
+        fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
+            .then(res => res.json())
+            .then(countries => {{
                 
-                if (rAlt > 25) {{
-                    scene.remove(rocket);
-                    rocket = null;
+                const world = Globe()
+                (document.getElementById('globeViz'))
+                .backgroundColor('#000000')
+                
+                // === 核心修改：不加载图片，用网格线 ===
+                .globeMaterial(new THREE.MeshPhongMaterial({{
+                    color: 0x001133, // 深蓝底色
+                    opacity: 0.7,
+                    transparent: true,
+                    emissive: 0x000022
+                }}))
+                .atmosphereColor('#00ccff')
+                .atmosphereAltitude(0.25)
+                
+                // 用六边形显示陆地 (科技感)
+                .hexPolygonsData(countries.features)
+                .hexPolygonResolution(3)
+                .hexPolygonMargin(0.3)
+                .hexPolygonColor(() => 'rgba(0, 200, 255, 0.3)') // 浅蓝陆地
+                .hexPolygonAltitude(0.02)
+
+                // 卫星
+                .customLayerData(satellites)
+                .customThreeObject(d => {{
+                    const mesh = new THREE.Mesh(
+                        new THREE.SphereGeometry(d.radius, 8, 8),
+                        new THREE.MeshBasicMaterial({{ color: d.color }})
+                    );
+                    const glow = new THREE.Mesh(
+                        new THREE.SphereGeometry(d.radius * 3, 8, 8),
+                        new THREE.MeshBasicMaterial({{ color: d.color, transparent: true, opacity: 0.5 }})
+                    );
+                    mesh.add(glow);
+                    return mesh;
+                }})
+                .customThreeObjectUpdate((obj, d) => {{
+                    Object.assign(obj.position, world.getCoords(d.lat, d.lng += d.speed, d.alt));
+                }})
+
+                // 资产
+                .pointsData(myAssets)
+                .pointLat('lat').pointLng('lng')
+                .pointColor(() => '#ffaa00')
+                .pointAltitude(0.1)
+                .pointRadius(1.0)
+                .pointPulseRipple(true)
+
+                // 标签
+                .htmlElementsData(myAssets)
+                .htmlLat('lat').htmlLng('lng')
+                .htmlElement(d => {{
+                    const el = document.createElement('div');
+                    el.className = 'label';
+                    el.innerText = d.name;
+                    return el;
+                }});
+
+                // 3. 动画控制
+                const scene = world.scene();
+                
+                // 星空
+                const starGeo = new THREE.BufferGeometry();
+                const starMat = new THREE.PointsMaterial({{color:0xffffff, size:0.5}});
+                const stars = [];
+                for(let i=0; i<5000; i++) stars.push((Math.random()-0.5)*4000);
+                starGeo.setAttribute('position', new THREE.Float32BufferAttribute(stars, 3));
+                scene.add(new THREE.Points(starGeo, starMat));
+
+                // 强制自转
+                world.controls().autoRotate = true;
+                world.controls().autoRotateSpeed = 1.0;
+
+                // 4. 火箭
+                let rocket = null;
+                let rAlt = 0;
+
+                if (doLaunch) {{
+                    const ov = document.getElementById('overlay');
+                    const cnt = document.getElementById('cnt');
+                    ov.style.opacity = 1;
+                    let c = 10;
+                    const t = setInterval(() => {{
+                        c--; cnt.innerText = c;
+                        if (c <= 0) {{
+                            clearInterval(t);
+                            ov.style.opacity = 0;
+                            launch();
+                        }}
+                    }}, 1000);
                 }}
-            }}
-            requestAnimationFrame(tick);
-        }})();
-        
-        world.pointOfView({{ altitude: 2.2 }});
+
+                function launch() {{
+                    const geo = new THREE.ConeGeometry(0.5, 2, 8);
+                    const mat = new THREE.MeshBasicMaterial({{color: 0xff0000}});
+                    rocket = new THREE.Mesh(geo, mat);
+                    const trail = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.8, 10, 8),
+                        new THREE.MeshBasicMaterial({{color: 0xffaa00, transparent:true, opacity:0.6}})
+                    );
+                    trail.position.y = -5;
+                    trail.rotation.x = Math.PI;
+                    rocket.add(trail);
+                    scene.add(rocket);
+                    rAlt = 0.1;
+                }}
+
+                (function tick() {{
+                    world.controls().update(); 
+                    world.customLayerData(world.customLayerData()); 
+                    
+                    if (rocket) {{
+                        rAlt += 0.1;
+                        const coords = world.getCoords(28.5, -80.6, rAlt);
+                        rocket.position.set(coords.x, coords.y, coords.z);
+                        rocket.lookAt(new THREE.Vector3(0,0,0));
+                        rocket.rotateX(Math.PI);
+                        if (rAlt > 30) {{ scene.remove(rocket); rocket = null; }}
+                    }}
+                    requestAnimationFrame(tick);
+                }})();
+                
+                world.pointOfView({{ altitude: 2.2 }});
+            }});
     </script>
 </body>
 </html>
 """
 
 # ==========================================
-# 4. 界面布局
+# 4. 界面渲染
 # ==========================================
 components.html(html_code, height=600, scrolling=False)
 
@@ -346,6 +310,7 @@ with c1:
                     st.write("")
                     if st.button("BUY", key=f"buy_{name}"):
                         buy(brand, name, price)
+                        st.rerun()
 
 with c2:
     st.markdown(f"""
@@ -357,15 +322,11 @@ with c2:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### 🚀 LAUNCH PAD")
-    if st.button("INITIATE LAUNCH (10s)", type="primary"):
+    if st.button("🚀 INITIATE LAUNCH", type="primary"):
         trigger_launch()
         st.rerun()
     
     st.markdown("---")
-    st.markdown("### 📋 ACTIVE UNITS")
-    if not st.session_state.inventory:
-        st.info("NONE")
-    else:
-        for item in reversed(st.session_state.inventory[-6:]):
-            st.code(f"{item['name']}")
+    st.markdown("### 📋 ACTIVE ASSETS")
+    for item in reversed(st.session_state.inventory[-6:]):
+        st.code(f"{item['name']}")
