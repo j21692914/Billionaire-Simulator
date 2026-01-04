@@ -6,7 +6,7 @@ import random
 # ==========================================
 # 0. 页面配置 (全屏黑金)
 # ==========================================
-st.set_page_config(page_title="JARVIS FINAL V8", layout="wide", page_icon="💠")
+st.set_page_config(page_title="JARVIS V9", layout="wide", page_icon="💠")
 
 st.markdown("""
 <style>
@@ -25,7 +25,6 @@ st.markdown("""
     .asset-card:hover { border-color: #00ffff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.2); }
     
     h1, h2, h3 {color: #00ccff !important; text-shadow: 0 0 8px #00ccff; letter-spacing: 2px;}
-    .price {color: #ffcc00; font-family: 'Courier New'; font-weight: bold;}
     
     /* 发射按钮 */
     div.stButton > button {
@@ -39,7 +38,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. 资产数据库 (全量 60+)
+# 1. 资产数据库 (全量)
 # ==========================================
 def create_db():
     return {
@@ -59,10 +58,6 @@ def create_db():
             ("Gulfstream", "G700", 78000000), ("Bombardier", "Global 8000", 78000000),
             ("Boeing", "BBJ 747-8", 450000000), ("Lürssen", "Azzam", 650000000),
             ("Oceanco", "Black Pearl", 220000000)
-        ],
-        "🏰 ESTATES": [
-            ("NY", "Central Park Tower", 250000000), ("London", "The Holme", 300000000),
-            ("France", "Villa Leopolda", 750000000), ("LA", "The One", 140000000)
         ]
     }
 DB = create_db()
@@ -91,7 +86,7 @@ def trigger_launch():
     st.session_state.launch_mode = True
 
 # ==========================================
-# 3. 贾维斯引擎 V8.0 (视觉增强版)
+# 3. 贾维斯线框引擎 V9.0 (稀疏网格+慢速发射)
 # ==========================================
 assets_json = json.dumps(st.session_state.inventory)
 launch_flag = "true" if st.session_state.launch_mode else "false"
@@ -116,9 +111,9 @@ html_code = f"""
         }}
         
         .asset-label {{
-            background: rgba(0, 10, 20, 0.8);
+            background: rgba(0, 10, 20, 0.85);
             border: 1px solid #00aaff;
-            color: #fff; padding: 3px 6px; border-radius: 2px;
+            color: #fff; padding: 4px 8px; border-radius: 2px;
             font-family: sans-serif; font-size: 9px;
             pointer-events: none;
             box-shadow: 0 0 8px rgba(0, 170, 255, 0.5);
@@ -135,9 +130,9 @@ html_code = f"""
 </head>
 <body>
     <div id="hud">
-        <div class="title">JARVIS COMMAND V8</div>
-        <div class="status">SYSTEM: STABLE | SATELLITES: 40 UNITS</div>
-        <div class="status">ASSETS DEPLOYED: {len(st.session_state.inventory)}</div>
+        <div class="title">JARVIS V9 // LOW-POLY</div>
+        <div class="status">GRID DENSITY: 24x24 (SPARSE)</div>
+        <div class="status">ACTIVE ASSETS: {len(st.session_state.inventory)}</div>
         <div id="launch-msg" class="launch-alert">⚠️ LAUNCH SEQUENCE: <span id="timer">10</span></div>
     </div>
     
@@ -147,32 +142,31 @@ html_code = f"""
         const myAssets = {assets_json};
         const doLaunch = {launch_flag};
 
-        // 1. 卫星群 (更多，更亮)
-        const satellites = [...Array(40).keys()].map(() => ({{
+        // 1. 卫星群 (红色)
+        const satellites = [...Array(30).keys()].map(() => ({{
             lat: (Math.random() - 0.5) * 180,
             lng: (Math.random() - 0.5) * 360,
-            alt: 0.3 + Math.random() * 0.6,
-            radius: 0.8,
-            color: Math.random() > 0.5 ? '#ff3300' : '#00ffff',
-            speed: (Math.random() * 0.4 + 0.1) * (Math.random()>0.5?1:-1)
+            alt: 0.3 + Math.random() * 0.5,
+            radius: 1.0,
+            color: '#ff3300',
+            speed: (Math.random() * 0.5 + 0.1) * (Math.random()>0.5?1:-1)
         }}));
 
-        // 2. 初始化地球 (极致镂空版)
+        // 2. 初始化地球
         const world = Globe()
             (document.getElementById('globeViz'))
             .backgroundColor('#000000')
             
-            // --- 核心修改：更亮、更通透的线框 ---
+            // --- 核心：隐藏原本的地球 ---
             .globeMaterial(new THREE.MeshBasicMaterial({{
-                color: 0x00ffff, // 高亮青色 (Electric Cyan)
-                wireframe: true, // 纯线框
+                color: 0x000000, 
                 transparent: true,
-                opacity: 0.5     // 提高一点不透明度让线条更清晰，但保持镂空感
+                opacity: 0 // 完全透明，隐藏原本的高密度球体
             }}))
-            .atmosphereColor('#0088ff')
-            .atmosphereAltitude(0.15)
+            .atmosphereColor('#0044ff') // 蓝色大气
+            .atmosphereAltitude(0.2)
             
-            // 卫星层
+            // 卫星
             .customLayerData(satellites)
             .customThreeObject(d => {{
                 const mesh = new THREE.Mesh(
@@ -195,20 +189,33 @@ html_code = f"""
                 return el;
             }});
 
-        // 3. 环境与动画
+        // 3. 手动添加稀疏网格 (Low-Poly Grid)
         const scene = world.scene();
         
+        // 创建一个只有 24x24 段数的球体网格，这样看起来就很稀疏
+        const gridGeo = new THREE.SphereGeometry(100, 24, 24); 
+        const gridMat = new THREE.MeshBasicMaterial({{
+            color: 0x00ffff,  // 高亮青色
+            wireframe: true,  // 线框模式
+            transparent: true,
+            opacity: 0.3      // 半透明
+        }});
+        const gridSphere = new THREE.Mesh(gridGeo, gridMat);
+        scene.add(gridSphere);
+
+        // 星空
         const starGeo = new THREE.BufferGeometry();
         const starMat = new THREE.PointsMaterial({{color:0xffffff, size:0.5}});
         const stars = [];
-        for(let i=0; i<5000; i++) stars.push((Math.random()-0.5)*4000);
+        for(let i=0; i<4000; i++) stars.push((Math.random()-0.5)*4000);
         starGeo.setAttribute('position', new THREE.Float32BufferAttribute(stars, 3));
         scene.add(new THREE.Points(starGeo, starMat));
 
+        // 自转
         world.controls().autoRotate = true;
         world.controls().autoRotateSpeed = 0.6;
 
-        // 4. 火箭发射系统 (巨型高亮版)
+        // 4. 慢速火箭系统
         let rocket = null;
         let rAlt = 0;
 
@@ -222,29 +229,28 @@ html_code = f"""
                 c--; tmr.innerText = c;
                 if (c <= 0) {{
                     clearInterval(t);
-                    msg.innerHTML = "🚀 TRAJECTORY ESTABLISHED";
+                    msg.innerHTML = "🚀 IGNITION...";
                     launch();
                 }}
             }}, 1000);
         }}
 
         function launch() {{
-            // --- 核心修改：火箭尺寸放大 3 倍 ---
-            const geo = new THREE.ConeGeometry(1.5, 5, 16); // 更大更粗
-            const mat = new THREE.MeshBasicMaterial({{color: 0xff5500}}); // 鲜艳橙红
+            const geo = new THREE.ConeGeometry(1.5, 6, 16); // 巨大火箭
+            const mat = new THREE.MeshBasicMaterial({{color: 0xff5500}});
             rocket = new THREE.Mesh(geo, mat);
             
-            // --- 核心修改：尾焰超大超亮 ---
+            // 尾焰 (粒子效果)
             const trail = new THREE.Mesh(
-                new THREE.ConeGeometry(2, 15, 16), // 超长尾焰
-                new THREE.MeshBasicMaterial({{color: 0xffaa00, transparent:true, opacity:0.8}}) // 高亮黄
+                new THREE.ConeGeometry(1.0, 15, 16),
+                new THREE.MeshBasicMaterial({{color: 0xffaa00, transparent:true, opacity:0.6}})
             );
             trail.position.y = -10;
             trail.rotation.x = Math.PI;
             rocket.add(trail);
             
             scene.add(rocket);
-            rAlt = 0.1;
+            rAlt = 0.1; // 初始高度
         }}
 
         (function tick() {{
@@ -252,17 +258,21 @@ html_code = f"""
             world.customLayerData(world.customLayerData()); 
 
             if (rocket) {{
-                rAlt += 0.12; // 飞行速度加快
+                // --- 极慢速爬升 ---
+                rAlt += 0.015; // 速度减慢 10倍，慢慢欣赏
+                
                 const coords = world.getCoords(28.5, -80.6, rAlt);
                 rocket.position.set(coords.x, coords.y, coords.z);
                 rocket.lookAt(new THREE.Vector3(0,0,0));
                 rocket.rotateX(Math.PI);
+                
+                // 慢慢消失
                 if (rAlt > 35) {{ scene.remove(rocket); rocket = null; }}
             }}
             requestAnimationFrame(tick);
         }})();
         
-        world.pointOfView({{ altitude: 2.4 }});
+        world.pointOfView({{ altitude: 2.5 }});
     </script>
 </body>
 </html>
