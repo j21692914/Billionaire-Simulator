@@ -1,121 +1,117 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import pandas as pd
-import random
 import json
+import random
+import time
 
 # ==========================================
-# 0. 页面配置 (全屏黑金)
+# 0. 页面配置
 # ==========================================
-st.set_page_config(page_title="HOLO-COMMANDER", layout="wide", page_icon="🌐")
+st.set_page_config(page_title="JARVIS GLOBAL COMMAND", layout="wide", page_icon="⚛️")
 
 st.markdown("""
 <style>
-    .stApp {background-color: #000000; color: #00ffcc; font-family: 'Segoe UI', monospace;}
-    
-    /* 隐藏默认元素 */
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    
-    /* 侧边栏 */
+    .stApp {background-color: #000000; color: #00aaff; font-family: 'Segoe UI', monospace;}
     [data-testid="stSidebar"] {background-color: #050505; border-right: 1px solid #003333;}
+    header, footer {visibility: hidden;}
     
     /* 资产卡片 */
     .asset-card {
-        background: rgba(0, 20, 20, 0.8);
-        border: 1px solid #00ffcc;
-        border-radius: 4px;
-        padding: 15px;
-        margin-bottom: 10px;
-        box-shadow: 0 0 10px rgba(0, 255, 204, 0.1);
+        background: rgba(0, 10, 20, 0.9);
+        border: 1px solid #0044ff;
+        border-left: 3px solid #00aaff;
+        border-radius: 2px;
+        padding: 12px;
+        margin-bottom: 8px;
         transition: all 0.3s;
     }
     .asset-card:hover {
-        background: rgba(0, 40, 40, 0.9);
-        box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
-        transform: translateX(5px);
+        background: rgba(0, 30, 50, 1);
+        transform: translateX(10px);
+        box-shadow: 0 0 15px rgba(0, 170, 255, 0.4);
     }
     
-    /* 字体样式 */
-    h1, h2, h3 {color: #00ffcc !important; text-shadow: 0 0 10px #00ffcc; letter-spacing: 2px;}
-    .price-tag {color: #ffcc00; font-weight: bold; font-family: 'Courier New';}
-    .brand-tag {color: #0088aa; font-size: 0.8em; text-transform: uppercase;}
+    /* 字体 */
+    h1, h2, h3 {color: #00aaff !important; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 8px #00aaff;}
+    .price {color: #00ffcc; font-family: 'Courier New'; font-weight: bold;}
     
-    /* 按钮特效 */
-    div.stButton > button {
-        background: transparent;
-        border: 1px solid #00ffcc;
-        color: #00ffcc;
-        border-radius: 0px;
-        transition: 0.2s;
+    /* 红色发射按钮 */
+    .launch-btn {
+        border: 1px solid #ff3300 !important;
+        color: #ff3300 !important;
+        background: rgba(255, 50, 0, 0.1) !important;
     }
-    div.stButton > button:hover {
-        background: #00ffcc;
-        color: black;
-        box-shadow: 0 0 15px #00ffcc;
+    .launch-btn:hover {
+        background: #ff3300 !important;
+        color: #000 !important;
+        box-shadow: 0 0 20px #ff3300;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# 1. 资产数据库 (V17.0 全量回归)
+# 1. 资产数据库 (含军事)
 # ==========================================
 def create_db():
     return {
-        "🏎️ LAND UNITS (Cars)": [
-            ("Mercedes-AMG", "G 63 Squared", 350000), ("Rolls-Royce", "Cullinan Black", 480000),
-            ("Rolls-Royce", "Phantom VIII", 650000), ("Ferrari", "SF90 Stradale", 550000),
-            ("Lamborghini", "Revuelto", 600000), ("Bugatti", "Chiron Super Sport", 3900000),
-            ("Aston Martin", "Valkyrie", 3500000), ("Land Rover", "Range Rover SV", 250000)
+        "⚔️ MILITARY (Classified)": [
+            ("Lockheed Martin", "F-22 Raptor Squad", 350000000),
+            ("Northrop", "B-2 Spirit Stealth", 2100000000),
+            ("General Dynamics", "F-16 Fighting Falcon", 60000000),
+            ("Navy", "Nimitz Class Carrier", 8500000000),
+            ("Navy", "Virginia Class Sub", 2800000000),
+            ("Army", "M1A2 Abrams Batallion", 90000000),
+            ("Raytheon", "Patriot Missile Battery", 1000000000)
         ],
-        "✈️ AIR UNITS (Jets)": [
-            ("Gulfstream", "G700 Flagship", 78000000), ("Gulfstream", "G650ER", 70000000),
-            ("Bombardier", "Global 8000", 78000000), ("Boeing", "BBJ 787 Dreamliner", 250000000),
-            ("Dassault", "Falcon 10X", 75000000), ("Embraer", "Lineage 1000E", 53000000)
+        "🏎️ LAND ASSETS": [
+            ("Mercedes-AMG", "G 63 6x6", 650000), ("Rolls-Royce", "Phantom VIII Armor", 1200000),
+            ("Bugatti", "Centodieci", 9000000), ("Tesla", "Cybertruck Foundation", 120000)
         ],
-        "⚓ NAVAL UNITS (Yachts)": [
-            ("Lürssen", "Azzam (180m)", 600000000), ("Blohm+Voss", "Eclipse", 500000000),
-            ("Oceanco", "Black Pearl", 220000000), ("Feadship", "Project 1010", 300000000)
+        "✈️ AIR ASSETS": [
+            ("Gulfstream", "G700 Executive", 78000000), ("Boeing", "BBJ 747-8i", 420000000),
+            ("Sikorsky", "S-76D Helicopter", 15000000)
         ],
-        "🏰 BASE UNITS (Estates)": [
-            ("New York", "Central Park Tower PH", 250000000), ("London", "The Holme", 300000000),
-            ("Shanghai", "Tan Gong Villa", 100000000), ("Hong Kong", "Barker Road", 280000000)
+        "⚓ NAVAL ASSETS": [
+            ("Lürssen", "Project Blue", 600000000), ("Oceanco", "Black Pearl", 220000000)
         ]
     }
 
 DB = create_db()
 
 # ==========================================
-# 2. 核心逻辑 (银行 & 库存)
+# 2. 状态管理
 # ==========================================
 if 'cash' not in st.session_state:
-    st.session_state.cash = 10000000000 # 100亿
-    st.session_state.inventory = [] # 资产清单
-    # 预设几个资产以便展示地图效果
-    st.session_state.inventory.append({"brand":"Gulfstream", "name":"G650ER [PRE-OWNED]", "price":65000000, "lat": 34.0, "lng": -118.2})
-    st.session_state.inventory.append({"brand":"Lürssen", "name":"Azzam [DEPLOYED]", "price":600000000, "lat": 25.0, "lng": 55.0})
+    st.session_state.cash = 50000000000
+    st.session_state.inventory = []
+if 'launch_trigger' not in st.session_state:
+    st.session_state.launch_trigger = False
 
+# 购买逻辑
 def buy(brand, name, price):
     if st.session_state.cash >= price:
         st.session_state.cash -= price
-        # 随机生成一个坐标用于地图展示
-        lat = random.uniform(-60, 70)
-        lng = random.uniform(-180, 180)
-        st.session_state.inventory.append({"brand": brand, "name": name, "price": price, "lat": lat, "lng": lng})
-        st.toast(f"✅ UNIT DEPLOYED: {name}")
+        st.session_state.inventory.append({
+            "brand": brand, "name": name, "price": price,
+            "lat": random.uniform(-60, 60), "lng": random.uniform(-180, 180)
+        })
+        st.toast(f"✅ UNIT ACQUIRED: {name}")
         st.rerun()
 
-def sell(i):
-    item = st.session_state.inventory.pop(i)
-    st.session_state.cash += item['price']
-    st.toast(f"💰 UNIT LIQUIDATED: {item['name']}")
+# 发射逻辑
+def trigger_launch():
+    st.session_state.launch_trigger = True
     st.rerun()
 
 # ==========================================
-# 3. 全息地球引擎 (HTML/JS 嵌入)
+# 3. 全息引擎 (Transparent Marvel Style)
 # ==========================================
-# 将Python数据转换为JSON传递给JS
-assets_json = json.dumps(st.session_state.inventory)
+assets_data = json.dumps(st.session_state.inventory)
+launch_status = "true" if st.session_state.launch_trigger else "false"
+
+# 发射后重置状态，防止刷新页面重复发射
+if st.session_state.launch_trigger:
+    st.session_state.launch_trigger = False
 
 html_code = f"""
 <!DOCTYPE html>
@@ -124,146 +120,203 @@ html_code = f"""
     <style>
         body {{ margin: 0; background: #000; overflow: hidden; }}
         
-        /* 扫描线滤镜 */
-        .scanline {{
-            position: fixed; left: 0; top: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
-            background-size: 100% 4px;
-            pointer-events: none; z-index: 10;
+        /* 倒计时覆盖层 */
+        #countdown-layer {{
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            pointer-events: none; z-index: 100;
+            display: none;
+        }}
+        #countdown-text {{
+            font-family: 'Courier New', monospace;
+            font-size: 10vw; color: #ff3300; font-weight: bold;
+            text-shadow: 0 0 30px #ff3300;
+            animation: pulse 0.8s infinite;
         }}
         
-        /* HUD 标题 */
+        @keyframes pulse {{
+            0% {{ transform: scale(1); opacity: 1; }}
+            50% {{ transform: scale(1.1); opacity: 0.8; }}
+            100% {{ transform: scale(1); opacity: 1; }}
+        }}
+
+        /* HUD */
         #hud {{
-            position: absolute; top: 20px; left: 20px; z-index: 20;
-            font-family: 'Courier New', monospace; color: #00ffcc;
+            position: absolute; top: 20px; left: 20px; z-index: 50;
+            font-family: 'Segoe UI', sans-serif; color: #00aaff;
             pointer-events: none;
         }}
+        .hud-line {{ border-left: 2px solid #00aaff; padding-left: 10px; margin-bottom: 5px; }}
         
-        /* 交互卡片 */
-        .label-card {{
-            background: rgba(0, 20, 30, 0.9);
-            border: 1px solid #00ffcc;
-            color: #00ffcc;
-            padding: 8px;
-            border-radius: 2px;
-            font-family: monospace;
-            font-size: 10px;
-            box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
-            pointer-events: none;
-        }}
     </style>
     <script src="https://unpkg.com/three"></script>
     <script src="https://unpkg.com/globe.gl"></script>
 </head>
 <body>
-    <div class="scanline"></div>
+    <div id="countdown-layer"><div id="countdown-text">10</div></div>
+    
     <div id="hud">
-        <h2 style="margin:0; text-shadow: 0 0 10px #00ffcc;">GLOBAL ASSET COMMAND</h2>
-        <div style="font-size:12px; opacity:0.8;">SYSTEM ONLINE | SAT-LINK: STABLE</div>
-        <div style="font-size:12px; opacity:0.8;">ACTIVE UNITS: {len(st.session_state.inventory)}</div>
+        <h1 style="margin:0; text-shadow:0 0 15px #00aaff;">STARK WORLD SYSTEM</h1>
+        <div class="hud-line">ORBITAL DEFENSE: ONLINE</div>
+        <div class="hud-line">GLOBAL ASSETS: {len(st.session_state.inventory)}</div>
+        <div class="hud-line" id="status-msg">STATUS: MONITORING</div>
     </div>
+    
     <div id="globeViz"></div>
 
     <script>
-        // 1. 获取Python传来的资产数据
-        const myAssets = {assets_json};
+        // 1. 数据准备
+        const assets = {assets_data};
+        const shouldLaunch = {launch_status};
         
-        // 2. 生成装饰性数据 (卫星 & 雷达)
-        const N_SATS = 12;
-        const satellites = [...Array(N_SATS).keys()].map(() => ({{
-            lat: (Math.random() - 0.5) * 180,
+        // 生成大量卫星 (红/蓝发光点)
+        const satellites = [...Array(20).keys()].map(() => ({{
+            lat: (Math.random() - 0.5) * 160,
             lng: (Math.random() - 0.5) * 360,
             alt: 0.3 + Math.random() * 0.4,
-            speed: (Math.random() * 0.2 + 0.05) * (Math.random()>0.5?1:-1),
-            color: Math.random() > 0.3 ? '#00ffcc' : '#ff3300'
+            radius: 1.5,
+            color: Math.random() > 0.5 ? '#ff3300' : '#00aaff',
+            speed: (Math.random() * 0.5 + 0.2) * (Math.random()>0.5?1:-1)
         }}));
 
-        const N_RINGS = 8;
-        const rings = [...Array(N_RINGS).keys()].map(() => ({{
-            lat: (Math.random() - 0.5) * 100,
-            lng: (Math.random() - 0.5) * 360,
-            maxR: Math.random() * 10 + 3,
-            speed: Math.random() * 2 + 0.5,
-            repeat: Math.random() * 2000 + 1000
-        }}));
-
-        // 3. 初始化地球
+        // 2. 初始化地球 (透明全息风)
         const world = Globe()
             (document.getElementById('globeViz'))
             .backgroundColor('#000000')
-            // 全息风格贴图 (夜景 + 拓扑)
+            // 使用夜景图作为基础，但会调整材质使其透明
             .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
             .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-            // 大气发光效果
-            .atmosphereColor('#00ccff')
-            .atmosphereAltitude(0.25)
+            .atmosphereColor('#0088ff')
+            .atmosphereAltitude(0.3)
             
-            // --- 资产点 (光柱) ---
-            .pointsData(myAssets)
-            .pointLat('lat')
-            .pointLng('lng')
-            .pointColor(() => '#ffcc00') // 金色代表资产
-            .pointAltitude(0.1)
-            .pointRadius(0.5)
-            
-            // --- 卫星系统 (3D球体) ---
-            .objectsData(satellites)
-            .objectLat('lat')
-            .objectLng('lng')
-            .objectAltitude('alt')
-            .objectThreeObject(d => {{
-                const g = new THREE.Group();
-                // 卫星本体
+            // --- 卫星 (自定义发光球体) ---
+            .customLayerData(satellites)
+            .customThreeObject(d => {{
                 const mesh = new THREE.Mesh(
-                    new THREE.SphereGeometry(1, 8, 8),
-                    new THREE.MeshLambertMaterial({{ color: d.color, emissive: d.color, emissiveIntensity: 1 }})
+                    new THREE.SphereGeometry(d.radius, 8, 8),
+                    new THREE.MeshBasicMaterial({{ color: d.color }})
                 );
-                g.add(mesh);
-                return g;
+                // 添加发光光晕
+                const glow = new THREE.Mesh(
+                    new THREE.SphereGeometry(d.radius * 3, 8, 8),
+                    new THREE.MeshBasicMaterial({{ color: d.color, transparent: true, opacity: 0.3 }})
+                );
+                mesh.add(glow);
+                return mesh;
             }})
-            
-            // --- 雷达波 ---
-            .ringsData(rings)
-            .ringColor(() => t => `rgba(0, 255, 204, ${{1-t}})`)
-            .ringMaxRadius('maxR')
-            .ringPropagationSpeed('speed')
-            .ringRepeatPeriod('repeat')
-            
-            // --- HTML 标签 (显示资产名字) ---
-            .htmlElementsData(myAssets)
-            .htmlLat('lat')
-            .htmlLng('lng')
-            .htmlElement(d => {{
-                const el = document.createElement('div');
-                el.className = 'label-card';
-                el.innerHTML = `<div>${{d.name}}</div><div style="font-size:8px; opacity:0.7;">${{d.brand}}</div>`;
-                return el;
-            }});
+            .customThreeObjectUpdate((obj, d) => {{
+                // 卫星运动逻辑
+                Object.assign(obj.position, world.getCoords(d.lat, d.lng += d.speed, d.alt));
+            }})
 
-        // 4. 动画循环 (确保旋转和卫星飞行)
-        // 添加星空背景
+            // --- 资产点 (改为蓝色全息波纹，去掉了黄色柱子) ---
+            .ringsData(assets)
+            .ringColor(() => t => `rgba(0, 170, 255, ${{1-t}})`)
+            .ringMaxRadius(5)
+            .ringPropagationSpeed(2)
+            .ringRepeatPeriod(2000);
+
+        // 3. 材质黑客：让地球变透明 (Marvel Style)
+        // 等待材质加载完成后修改
+        setTimeout(() => {{
+            const globeObj = world.scene().children.find(obj => obj.type === 'Group');
+            if(globeObj) {{
+                globeObj.traverse(child => {{
+                    if (child.isMesh && child.material.name === 'globe-material') {{
+                        child.material.transparent = true;
+                        child.material.opacity = 0.85; // 半透明
+                        child.material.color.setHex(0x4444ff); // 偏蓝色调
+                        child.material.emissive.setHex(0x001133); // 自发光微蓝
+                    }}
+                }});
+            }}
+        }}, 1000);
+
+        // 4. 场景特效 (星空 & 自转)
         const scene = world.scene();
+        
+        // 增加星空
         const starGeo = new THREE.BufferGeometry();
         const starMat = new THREE.PointsMaterial({{color:0xffffff, size:0.5}});
         const stars = [];
-        for(let i=0; i<4000; i++) stars.push((Math.random()-0.5)*4000);
+        for(let i=0; i<5000; i++) stars.push((Math.random()-0.5)*4000);
         starGeo.setAttribute('position', new THREE.Float32BufferAttribute(stars, 3));
         scene.add(new THREE.Points(starGeo, starMat));
 
-        // 自动旋转 & 卫星运动
+        // 自动旋转控制器
         world.controls().autoRotate = true;
-        world.controls().autoRotateSpeed = 0.5;
+        world.controls().autoRotateSpeed = 0.6; // 转速
 
-        (function tick() {{
-            // 更新卫星位置
-            satellites.forEach(s => s.lng += s.speed);
-            world.objectsData([...satellites]);
+        // 5. 火箭发射系统
+        if (shouldLaunch) {{
+            const countdownEl = document.getElementById('countdown-layer');
+            const numEl = document.getElementById('countdown-text');
+            const statusEl = document.getElementById('status-msg');
             
+            countdownEl.style.display = 'flex';
+            statusEl.innerText = "STATUS: LAUNCH SEQUENCE INITIATED";
+            statusEl.style.color = "#ff3300";
+            
+            let count = 10;
+            const timer = setInterval(() => {{
+                count--;
+                numEl.innerText = count;
+                
+                if(count <= 0) {{
+                    clearInterval(timer);
+                    countdownEl.style.display = 'none';
+                    launchRocket();
+                    statusEl.innerText = "STATUS: ROCKET IN TRAJECTORY";
+                }}
+            }}, 1000);
+        }}
+
+        function launchRocket() {{
+            // 创建火箭对象
+            const rocketGeo = new THREE.ConeGeometry(0.5, 2, 8);
+            const rocketMat = new THREE.MeshBasicMaterial({{ color: 0xff3300 }});
+            const rocket = new THREE.Mesh(rocketGeo, rocketMat);
+            
+            // 尾焰
+            const trailGeo = new THREE.ConeGeometry(0.8, 5, 8);
+            const trailMat = new THREE.MeshBasicMaterial({{ color: 0xffaa00, transparent: true, opacity: 0.6 }});
+            const trail = new THREE.Mesh(trailGeo, trailMat);
+            trail.position.y = -3;
+            trail.rotation.x = Math.PI;
+            rocket.add(trail);
+
+            scene.add(rocket);
+
+            // 发射动画参数
+            let altitude = 1.1; // 初始高度 (地表)
+            const launchLat = 28.5; // 卡纳维拉尔角附近
+            const launchLng = -80.6;
+            
+            function animateRocket() {{
+                altitude += 0.05; // 上升速度
+                const coords = world.getCoords(launchLat, launchLng, altitude);
+                rocket.position.set(coords.x, coords.y, coords.z);
+                
+                // 让火箭头朝外
+                rocket.lookAt(new THREE.Vector3(0,0,0));
+                rocket.rotateX(Math.PI); // 修正朝向
+
+                if(altitude < 10) {{ // 飞到一定高度停止或消失
+                    requestAnimationFrame(animateRocket);
+                }} else {{
+                    scene.remove(rocket);
+                }}
+            }}
+            animateRocket();
+        }}
+
+        // 强制刷新渲染循环
+        (function tick() {{
+            // 确保自转持续
+            world.controls().update();
             requestAnimationFrame(tick);
         }})();
-        
-        // 初始视角
-        world.pointOfView({{ altitude: 2.0 }});
+
     </script>
 </body>
 </html>
@@ -272,40 +325,45 @@ html_code = f"""
 # ==========================================
 # 4. 界面布局
 # ==========================================
-
-# --- 顶部：全息地球 (高度600px) ---
+# 顶部全息屏
 components.html(html_code, height=600, scrolling=False)
 
-# --- 底部：资产控制台 ---
+# 控制台区域
 c1, c2 = st.columns([3, 1])
 
 with c1:
-    st.markdown("### 🛒 ASSET ACQUISITION MARKET")
+    st.markdown("### 🛒 MILITARY & ASSET PROCUREMENT")
     tabs = st.tabs(list(DB.keys()))
     
-    for i, (cat_name, items) in enumerate(DB.items()):
+    for i, (cat, items) in enumerate(DB.items()):
         with tabs[i]:
             for brand, name, price in items:
                 col_a, col_b = st.columns([4, 1])
                 with col_a:
                     st.markdown(f"""
                     <div class="asset-card">
-                        <div class="brand-tag">{brand}</div>
-                        <div style="font-size:1.2em; font-weight:bold;">{name}</div>
-                        <div class="price-tag">${price:,}</div>
+                        <div style="color:#00aaff; font-size:0.8em;">{brand}</div>
+                        <div style="font-size:1.2em; font-weight:bold; color:#fff;">{name}</div>
+                        <div class="price">${price:,}</div>
                     </div>
                     """, unsafe_allow_html=True)
                 with col_b:
                     st.write("")
-                    if st.button("DEPLOY", key=f"buy_{name}"):
+                    if st.button("ACQUIRE", key=f"buy_{name}"):
                         buy(brand, name, price)
 
 with c2:
-    st.markdown("### 🏦 TREASURY")
+    st.markdown("### 🛑 DANGER ZONE")
+    # 火箭发射按钮 (特殊样式)
+    if st.button("🚀 INITIATE LAUNCH", key="btn_launch", help="Start 10s Countdown"):
+        trigger_launch()
+    
+    st.markdown("---")
+    st.markdown("### 💰 TREASURY")
     st.markdown(f"""
-    <div style="background:#111; padding:20px; border:1px solid #ffcc00; text-align:center;">
-        <div style="color:#888; font-size:0.8em;">LIQUID ASSETS</div>
-        <div style="font-size:2em; color:#ffcc00; font-family:'Courier New'; font-weight:bold;">
+    <div style="border:1px solid #00ffcc; padding:20px; text-align:center; border-radius:4px;">
+        <div style="color:#888;">LIQUID FUNDS</div>
+        <div style="font-size:2em; color:#00ffcc; font-family:'Courier New';">
             ${st.session_state.cash:,.0f}
         </div>
     </div>
@@ -313,10 +371,7 @@ with c2:
     
     st.markdown("### 📋 ACTIVE UNITS")
     if not st.session_state.inventory:
-        st.info("NO ACTIVE UNITS")
+        st.info("NO ACTIVE ASSETS")
     else:
-        for i, item in enumerate(st.session_state.inventory):
-            with st.expander(f"{item['name']}"):
-                st.caption(f"Coords: {item['lat']:.2f}, {item['lng']:.2f}")
-                if st.button("RECALL (SELL)", key=f"sell_{i}"):
-                    sell(i)
+        for item in reversed(st.session_state.inventory[-5:]): # 只显示最近5个
+            st.code(f"{item['name']}\nCOORD: {item['lat']:.2f}, {item['lng']:.2f}")
